@@ -117,7 +117,7 @@ const pageVariants = {
 
 // ─── Rating Stars ───────────────────────────────────────────────────────────
 function RatingStars({ rating }: { rating: number }) {
-  const stars = [];
+  const stars: React.ReactNode[] = [];
   const fullStars = Math.floor(rating);
   const hasHalf = rating % 1 >= 0.3;
   for (let i = 0; i < 5; i++) {
@@ -403,9 +403,25 @@ function HomeView() {
           {roleplayStories.map((story) => (
             <Card
               key={story.id}
-              className="cursor-pointer overflow-hidden border-amber-200/50 hover:border-amber-400 dark:border-amber-900/50 dark:hover:border-amber-600 transition-all group"
+              className="cursor-pointer overflow-hidden border-amber-200/50 hover:border-amber-400 dark:border-amber-900/50 dark:hover:border-amber-600 transition-all group relative"
               onClick={() => handleRoleplayClick(story)}
             >
+              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="p-1.5 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm shadow-sm hover:bg-white dark:hover:bg-black/90 transition-colors"
+                    >
+                      <Share2 className="w-3.5 h-3.5 text-foreground" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-auto">
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Share this story</p>
+                    <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/?roleplay=${encodeURIComponent(slugify(story.title))}`} title={story.title} description={story.description} />
+                  </PopoverContent>
+                </Popover>
+              </div>
               <CardHeader className="p-4 pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
@@ -1020,6 +1036,19 @@ function RoleplayView() {
             <p className="text-white/70 mt-3 max-w-2xl leading-relaxed">{currentRoleplayStory.description}</p>
           </div>
         </div>
+      </div>
+
+      {/* Share */}
+      <div className="flex items-center gap-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline"><Share2 className="w-4 h-4 mr-2" />Share Story</Button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="w-auto">
+            <p className="text-sm font-medium text-muted-foreground mb-2">Share this adventure</p>
+            <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/?roleplay=${encodeURIComponent(slugify(currentRoleplayStory.title))}`} title={currentRoleplayStory.title} description={currentRoleplayStory.description} />
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Story Info */}

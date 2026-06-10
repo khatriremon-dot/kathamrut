@@ -55,12 +55,21 @@ export const metadata: Metadata = {
     siteName: "Kathamrut",
     locale: "en_US",
     alternateLocale: ["hi_IN", "ne_NP"],
+    images: [
+      {
+        url: `${siteUrl}/api/og?title=Kathamrut&description=Stories+Across+Languages&type=novel`,
+        width: 1200,
+        height: 630,
+        alt: "Kathamrut — Stories Across Languages",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Kathamrut — Stories Across Languages",
     description:
       "Discover captivating novels in English, Hindi, and Nepali. Read immersive stories and play interactive roleplaying adventures.",
+    images: [`${siteUrl}/api/og?title=Kathamrut&description=Stories+Across+Languages&type=novel`],
   },
   robots: {
     index: true,

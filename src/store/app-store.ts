@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type AppView = 'home' | 'library' | 'reader' | 'roleplay' | 'roleplay-game';
+export type AppView = 'home' | 'library' | 'reader' | 'roleplay' | 'roleplay-game' | 'bookshelf';
 export type Language = 'en' | 'hi' | 'ne' | 'all';
 export type ThemeMode = 'light' | 'dark' | 'sepia' | 'green' | 'night';
 
