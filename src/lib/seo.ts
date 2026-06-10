@@ -1,4 +1,4 @@
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kathamrut.netlify.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kathamrut.com";
 
 const LANGUAGE_NAMES: Record<string, string> = {
   en: "English",

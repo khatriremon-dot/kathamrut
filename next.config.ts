@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -10,11 +9,15 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**.netlify.app",
+        hostname: "**.vercel.app",
       },
       {
         protocol: "https",
         hostname: "**.aws.neon.tech",
+      },
+      {
+        protocol: "https",
+        hostname: "kathamrut.com",
       },
     ],
   },

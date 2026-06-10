@@ -3,22 +3,18 @@
 /*
  * Kathamrut - Main Application Page
  *
- * ARCHITECTURE NOTES:
- * - This is currently a single-page app (SPA) with all views managed via Zustand state.
- *   For proper SEO and shareability, individual routes should be created:
- *   TODO: /novel/[id] for novel detail pages with server-side rendering
- *   TODO: /novel/[id]/chapter/[number] for reader pages
- *   TODO: /roleplay/[id] for roleplay story detail pages
- *   TODO: /roleplay/[id]/play for the game view
- * - The entire page is 'use client' because view switching relies on client-side state.
- *   Next.js 16's strength is server components - a future refactor should use URL-based
- *   routing with server components for data fetching where possible.
- * - No pagination is currently implemented. Fine for 16 novels but should be added
- *   as the catalog grows.
- * - Admin routes have NO authentication. This should be addressed before production.
+ * The home page serves as the primary SPA experience with filters, novel grid,
+ * and roleplay stories. Individual content also has dedicated SSR routes:
+ *   /novel/[slug] - Novel detail with chapters
+ *   /novel/[slug]/chapter/[number] - Reader
+ *   /roleplay/[slug] - Roleplay story detail
+ *   /roleplay/[slug]/play - Interactive game
+ *   /bookshelf - User's saved novels
+ *   /library - All novels with filters
  */
 
 import { useEffect, useCallback, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore, type Novel, type Chapter, type RoleplayStory, type Choice } from '@/store/app-store';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -27,7 +23,6 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Sheet,
@@ -38,13 +33,12 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { ShareButtons, slugify } from '@/components/share-buttons';
-import { ErrorBoundary } from '@/components/error-boundary';
+import { Navbar } from '@/components/navbar';
 import {
   Book,
   Library,
   Bookmark,
   Swords,
-  Home as HomeIcon,
   ChevronLeft,
   ChevronRight,
   Search,
@@ -58,18 +52,12 @@ import {
   Clock,
   Globe,
   Share2,
-  Linkedin,
 } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -81,17 +69,17 @@ const LANGUAGES = [
 ] as const;
 
 const CATEGORIES = [
-  'All',
-  'Adventure',
-  'Mystery',
-  'Fantasy',
-  'Romance',
-  'Literary',
-  'Sci-Fi',
-  'Horror',
-  'Action',
-  'Drama',
-  'Historical',
+  'all',
+  'adventure',
+  'mystery',
+  'fantasy',
+  'romance',
+  'literary',
+  'sci-fi',
+  'horror',
+  'action',
+  'drama',
+  'historical',
 ] as const;
 
 const THEME_COLORS: Record<string, { bg: string; text: string; label: string; icon: React.ReactNode }> = {
@@ -106,13 +94,6 @@ const LANGUAGE_LABELS: Record<string, string> = {
   en: 'English',
   hi: 'हिंदी',
   ne: 'नेपाली',
-};
-
-// ─── Page Transitions ────────────────────────────────────────────────────────
-const pageVariants = {
-  initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -20 },
 };
 
 // ─── Rating Stars ───────────────────────────────────────────────────────────
@@ -132,101 +113,9 @@ function RatingStars({ rating }: { rating: number }) {
   return <div className="flex items-center gap-0.5">{stars}</div>;
 }
 
-// ─── Navigation Bar ───────────────────────────────────────────────────────
-function NavBar() {
-  const { currentView, setView } = useAppStore();
-
-  const tabs = [
-    { view: 'home' as const, label: 'Home', icon: HomeIcon },
-    { view: 'library' as const, label: 'Library', icon: Library },
-    { view: 'bookshelf' as const, label: 'Bookshelf', icon: Bookmark },
-    { view: 'roleplay' as const, label: 'Roleplay', icon: Swords },
-  ];
-
-  return (
-    <>
-      {/* Desktop top nav */}
-      <nav className="hidden md:flex fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-6 flex items-center h-14">
-          <button
-            onClick={() => setView('home')}
-            className="flex items-center gap-2 font-bold text-lg mr-8 hover:text-amber-600 transition-colors"
-          >
-            <Book className="w-5 h-5 text-amber-600" />
-            <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-              Kathamrut
-            </span>
-          </button>
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive =
-              tab.view === 'bookshelf'
-                ? currentView === 'bookshelf'
-                : currentView === tab.view || (tab.view === 'library' && currentView === 'reader');
-            return (
-              <button
-                key={tab.view}
-                onClick={() => setView(tab.view)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  isActive
-                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            );
-          })}
-          <a
-            href="/admin"
-            className="ml-auto flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
-          >
-            <Settings className="w-4 h-4" />
-            Admin
-          </a>
-        </div>
-      </nav>
-
-      {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/90 backdrop-blur-md border-t border-border safe-area-bottom">
-        <div className="flex items-center justify-around h-16">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive =
-              tab.view === 'bookshelf'
-                ? currentView === 'bookshelf'
-                : currentView === tab.view || (tab.view === 'library' && currentView === 'reader');
-            return (
-              <button
-                key={tab.view}
-                onClick={() => setView(tab.view)}
-                className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg transition-all ${
-                  isActive
-                    ? 'text-amber-600'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''} transition-transform`} />
-                <span className="text-xs font-medium">{tab.label}</span>
-              </button>
-            );
-          })}
-          <a
-            href="/admin"
-            className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-all"
-          >
-            <Settings className="w-5 h-5" />
-            <span className="text-xs font-medium">Admin</span>
-          </a>
-        </div>
-      </nav>
-    </>
-  );
-}
-
 // ─── Home View ──────────────────────────────────────────────────────────────
 function HomeView() {
+  const router = useRouter();
   const {
     novels,
     roleplayStories,
@@ -237,7 +126,6 @@ function HomeView() {
     searchQuery,
     setSearchQuery,
     setCurrentNovel,
-    setView,
     loading,
   } = useAppStore();
 
@@ -247,7 +135,7 @@ function HomeView() {
       result = result.filter((n) => n.language === languageFilter);
     }
     if (categoryFilter !== 'all') {
-      result = result.filter((n) => n.category === categoryFilter);
+      result = result.filter((n) => n.category.toLowerCase() === categoryFilter.toLowerCase());
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -264,17 +152,17 @@ function HomeView() {
   const handleNovelClick = useCallback(
     (novel: Novel) => {
       setCurrentNovel(novel);
-      setView('library');
+      router.push(`/novel/${slugify(novel.title)}`);
     },
-    [setCurrentNovel, setView]
+    [setCurrentNovel, router]
   );
 
   const handleRoleplayClick = useCallback(
     (story: RoleplayStory) => {
       useAppStore.getState().setCurrentRoleplayStory(story);
-      setView('roleplay');
+      router.push(`/roleplay/${slugify(story.title)}`);
     },
-    [setView]
+    [router]
   );
 
   return (
@@ -328,7 +216,7 @@ function HomeView() {
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted'
               }`}
             >
-              {cat}
+              {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
             </button>
           ))}
         </div>
@@ -418,7 +306,7 @@ function HomeView() {
                   </PopoverTrigger>
                   <PopoverContent align="start" className="w-auto">
                     <p className="text-sm font-medium text-muted-foreground mb-2">Share this story</p>
-                    <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/?roleplay=${encodeURIComponent(slugify(story.title))}`} title={story.title} description={story.description} />
+                    <ShareButtons url={`/roleplay/${slugify(story.title)}`} title={story.title} description={story.description} />
                   </PopoverContent>
                 </Popover>
               </div>
@@ -473,7 +361,7 @@ function NovelCard({ novel, onClick }: { novel: Novel; onClick: () => void }) {
               </PopoverTrigger>
               <PopoverContent align="start" className="w-auto">
                 <p className="text-sm font-medium text-muted-foreground mb-2">Share this novel</p>
-                <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/novel/${slugify(novel.title)}`} title={novel.title} description={novel.description} />
+                <ShareButtons url={`/novel/${slugify(novel.title)}`} title={novel.title} description={novel.description} />
               </PopoverContent>
             </Popover>
           </div>
@@ -519,6 +407,7 @@ function NovelCard({ novel, onClick }: { novel: Novel; onClick: () => void }) {
 
 // ─── Library View ──────────────────────────────────────────────────────────
 function LibraryView() {
+  const router = useRouter();
   const {
     currentNovel,
     setCurrentNovel,
@@ -558,19 +447,20 @@ function LibraryView() {
   }, [currentNovel?.id, setCurrentNovel]);
 
   const handleChapterClick = useCallback(
-    async (novelId: string, chapterId: string) => {
+    async (novelId: string, chapterId: string, chapterNumber: number) => {
       setView('reader');
       try {
         const res = await fetch(`/api/chapters/${chapterId}`);
         const chapter = await res.json();
         if (chapter && !chapter.error) {
           setCurrentChapter(chapter);
+          router.push(`/novel/${slugify(currentNovel!.title)}/chapter/${chapterNumber}`);
         }
       } catch {
         // handle error
       }
     },
-    [setView, setCurrentChapter]
+    [setView, setCurrentChapter, router, currentNovel]
   );
 
   const handleToggleBookshelf = useCallback(() => {
@@ -609,7 +499,7 @@ function LibraryView() {
     <div className="space-y-6">
       {/* Back button */}
       <button
-        onClick={() => setView('home')}
+        onClick={() => { setView('home'); router.push('/'); }}
         className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ChevronLeft className="w-4 h-4" />
@@ -659,7 +549,7 @@ function LibraryView() {
               </PopoverTrigger>
               <PopoverContent align="start" className="w-auto">
                 <p className="text-sm font-medium text-muted-foreground mb-2">Share this novel</p>
-                <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/?novel=${encodeURIComponent(slugify(currentNovel.title))}`} title={currentNovel.title} description={currentNovel.description} />
+                <ShareButtons url={`/novel/${slugify(currentNovel.title)}`} title={currentNovel.title} description={currentNovel.description} />
               </PopoverContent>
             </Popover>
           </div>
@@ -684,7 +574,7 @@ function LibraryView() {
             {currentNovel.chapters.map((chapter) => (
               <button
                 key={chapter.id}
-                onClick={() => handleChapterClick(currentNovel.id, chapter.id)}
+                onClick={() => handleChapterClick(currentNovel.id, chapter.id, chapter.number)}
                 className="w-full flex items-center gap-4 p-3 hover:bg-muted/50 transition-colors text-left group"
               >
                 <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 text-xs font-bold flex items-center justify-center">
@@ -713,6 +603,7 @@ function LibraryView() {
                   novel={novel}
                   onClick={() => {
                     setCurrentNovel(novel);
+                    router.push(`/novel/${slugify(novel.title)}`);
                   }}
                 />
               ))}
@@ -726,6 +617,7 @@ function LibraryView() {
 
 // ─── Reader View ────────────────────────────────────────────────────────────
 function ReaderView() {
+  const router = useRouter();
   const {
     currentNovel,
     currentChapter,
@@ -783,6 +675,7 @@ function ReaderView() {
           if (ch && !ch.error) {
             setCurrentChapter(ch);
             contentRef.current?.scrollTo({ top: 0 });
+            router.push(`/novel/${slugify(currentNovel.title)}/chapter/${prev.number}`);
           }
         } catch {
           // handle error
@@ -798,6 +691,7 @@ function ReaderView() {
           if (ch && !ch.error) {
             setCurrentChapter(ch);
             contentRef.current?.scrollTo({ top: 0 });
+            router.push(`/novel/${slugify(currentNovel.title)}/chapter/${next.number}`);
           }
         } catch {
           // handle error
@@ -806,7 +700,7 @@ function ReaderView() {
         }
       }
     },
-    [currentNovel, currentChapter, setCurrentChapter]
+    [currentNovel, currentChapter, setCurrentChapter, router]
   );
 
   const currentChapterIdx = currentNovel
@@ -832,7 +726,7 @@ function ReaderView() {
       {/* Back button + title */}
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <button
-          onClick={() => setView('library')}
+          onClick={() => { setView('library'); router.push(`/novel/${slugify(currentNovel.title)}`); }}
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -983,6 +877,7 @@ function ReaderView() {
 
 // ─── Roleplay View ──────────────────────────────────────────────────────────
 function RoleplayView() {
+  const router = useRouter();
   const { currentRoleplayStory, setView, setCurrentRoleplayStory } = useAppStore();
 
   if (!currentRoleplayStory) {
@@ -1000,13 +895,14 @@ function RoleplayView() {
   const handleBegin = () => {
     setCurrentRoleplayStory(currentRoleplayStory);
     setView('roleplay-game');
+    router.push(`/roleplay/${slugify(currentRoleplayStory.title)}/play`);
   };
 
   return (
     <div className="space-y-6">
       {/* Back button */}
       <button
-        onClick={() => setView('home')}
+        onClick={() => { setView('home'); router.push('/'); }}
         className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ChevronLeft className="w-4 h-4" />
@@ -1046,7 +942,7 @@ function RoleplayView() {
           </PopoverTrigger>
           <PopoverContent align="start" className="w-auto">
             <p className="text-sm font-medium text-muted-foreground mb-2">Share this adventure</p>
-            <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/?roleplay=${encodeURIComponent(slugify(currentRoleplayStory.title))}`} title={currentRoleplayStory.title} description={currentRoleplayStory.description} />
+            <ShareButtons url={`/roleplay/${slugify(currentRoleplayStory.title)}`} title={currentRoleplayStory.title} description={currentRoleplayStory.description} />
           </PopoverContent>
         </Popover>
       </div>
@@ -1105,7 +1001,7 @@ function RoleplayView() {
             </PopoverTrigger>
             <PopoverContent align="center" className="w-auto">
               <p className="text-sm font-medium text-muted-foreground mb-2">Share this story</p>
-              <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/?story=${encodeURIComponent(slugify(currentRoleplayStory.title))}`} title={currentRoleplayStory.title} description={currentRoleplayStory.description} />
+              <ShareButtons url={`/roleplay/${slugify(currentRoleplayStory.title)}`} title={currentRoleplayStory.title} description={currentRoleplayStory.description} />
             </PopoverContent>
           </Popover>
         </div>
@@ -1116,6 +1012,7 @@ function RoleplayView() {
 
 // ─── Roleplay Game View ─────────────────────────────────────────────────────
 function RoleplayGameView() {
+  const router = useRouter();
   const {
     currentRoleplayStory,
     currentScene,
@@ -1191,7 +1088,7 @@ function RoleplayGameView() {
       {/* Back + Title */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => setView('roleplay')}
+          onClick={() => { setView('roleplay'); router.push(`/roleplay/${slugify(currentRoleplayStory.title)}`); }}
           className="flex items-center gap-2 text-sm text-purple-300 hover:text-white transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -1206,7 +1103,7 @@ function RoleplayGameView() {
             </PopoverTrigger>
             <PopoverContent align="end" className="w-auto">
               <p className="text-sm font-medium text-muted-foreground mb-2">Share this adventure</p>
-              <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/roleplay/${slugify(currentRoleplayStory.title)}`} title={currentRoleplayStory.title} description={currentRoleplayStory.description} />
+              <ShareButtons url={`/roleplay/${slugify(currentRoleplayStory.title)}`} title={currentRoleplayStory.title} description={currentRoleplayStory.description} />
             </PopoverContent>
           </Popover>
           <Badge className="bg-purple-500/50 text-purple-200 border-purple-400/30">
@@ -1399,7 +1296,8 @@ function BookshelfView() {
 
 // ─── Main Page Component ──────────────────────────────────────────────────
 export default function KathamrutApp() {
-  const { currentView, setNovels, setRoleplayStories, loading } = useAppStore();
+  const router = useRouter();
+  const { currentView, setNovels, setRoleplayStories, setView, novels, loading } = useAppStore();
   const isDarkRoleplayView = currentView === 'roleplay-game' || currentView === 'roleplay';
 
   // Fetch initial data
@@ -1421,9 +1319,21 @@ export default function KathamrutApp() {
     fetchData();
   }, [setNovels, setRoleplayStories]);
 
+  // Backward compatibility: redirect old query param URLs to new routes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const novelSlug = params.get('novel');
+    const roleplaySlug = params.get('roleplay');
+    if (novelSlug) {
+      router.replace(`/novel/${novelSlug}`);
+    } else if (roleplaySlug) {
+      router.replace(`/roleplay/${roleplaySlug}`);
+    }
+  }, [router]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <NavBar />
+      <Navbar />
 
       {/* Main content - with padding for nav */}
       <main
@@ -1434,10 +1344,9 @@ export default function KathamrutApp() {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentView}
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25 }}
           >
             {currentView === 'home' && <HomeView />}

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export type AppView = 'home' | 'library' | 'reader' | 'roleplay' | 'roleplay-game' | 'bookshelf';
 export type Language = 'en' | 'hi' | 'ne' | 'all';
@@ -8,7 +9,6 @@ export interface ReadingSettings {
   fontSize: number;
   theme: ThemeMode;
   lineHeight: number;
-  pageWidth: number;
 }
 
 export interface Novel {
@@ -117,75 +117,96 @@ interface AppState {
   setRoleplayStories: (stories: RoleplayStory[]) => void;
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
-  // Navigation
-  currentView: 'home',
-  previousView: null,
-  setView: (view) => set({ previousView: get().currentView, currentView: view }),
-  goBack: () => {
-    const prev = get().previousView;
-    if (prev) set({ currentView: prev, previousView: null });
-    else set({ currentView: 'home', previousView: null });
-  },
+export const useAppStore = create<AppState>()(
+  persist(
+    (set, get) => ({
+      // Navigation
+      currentView: 'home',
+      previousView: null,
+      setView: (view) => set({ previousView: get().currentView, currentView: view }),
+      goBack: () => {
+        const prev = get().previousView;
+        if (prev) set({ currentView: prev, previousView: null });
+        else set({ currentView: 'home', previousView: null });
+      },
 
-  // Language filter
-  languageFilter: 'all',
-  setLanguageFilter: (lang) => set({ languageFilter: lang }),
-  categoryFilter: 'all',
-  setCategoryFilter: (cat) => set({ categoryFilter: cat }),
-  searchQuery: '',
-  setSearchQuery: (q) => set({ searchQuery: q }),
+      // Language filter
+      languageFilter: 'all',
+      setLanguageFilter: (lang) => set({ languageFilter: lang }),
+      categoryFilter: 'all',
+      setCategoryFilter: (cat) => set({ categoryFilter: cat }),
+      searchQuery: '',
+      setSearchQuery: (q) => set({ searchQuery: q }),
 
-  // Library
-  bookshelf: [],
-  addToBookshelf: (novelId) => set((state) => ({ bookshelf: [...new Set([...state.bookshelf, novelId])] })),
-  removeFromBookshelf: (novelId) => set((state) => ({ bookshelf: state.bookshelf.filter((id) => id !== novelId) })),
-  isInBookshelf: (novelId) => get().bookshelf.includes(novelId),
+      // Library
+      bookshelf: [],
+      addToBookshelf: (novelId) => set((state) => ({ bookshelf: [...new Set([...state.bookshelf, novelId])] })),
+      removeFromBookshelf: (novelId) => set((state) => ({ bookshelf: state.bookshelf.filter((id) => id !== novelId) })),
+      isInBookshelf: (novelId) => get().bookshelf.includes(novelId),
 
-  // Reader
-  currentNovel: null,
-  currentChapter: null,
-  readingProgress: {},
-  setCurrentNovel: (novel) => set({ currentNovel: novel }),
-  setCurrentChapter: (chapter) => set({ currentChapter: chapter }),
-  saveProgress: (novelId, chapterId, scrollPosition) =>
-    set((state) => ({
-      readingProgress: { ...state.readingProgress, [novelId]: { chapterId, scrollPosition } },
-    })),
-  getProgress: (novelId) => get().readingProgress[novelId] || null,
+      // Reader
+      currentNovel: null,
+      currentChapter: null,
+      readingProgress: {},
+      setCurrentNovel: (novel) => set({ currentNovel: novel }),
+      setCurrentChapter: (chapter) => set({ currentChapter: chapter }),
+      saveProgress: (novelId, chapterId, scrollPosition) =>
+        set((state) => ({
+          readingProgress: { ...state.readingProgress, [novelId]: { chapterId, scrollPosition } },
+        })),
+      getProgress: (novelId) => get().readingProgress[novelId] || null,
 
-  // Reading settings
-  readingSettings: {
-    fontSize: 18,
-    theme: 'light',
-    lineHeight: 1.8,
-    pageWidth: 720,
-  },
-  setReadingSettings: (settings) =>
-    set((state) => ({ readingSettings: { ...state.readingSettings, ...settings } })),
+      // Reading settings
+      readingSettings: {
+        fontSize: 18,
+        theme: 'light',
+        lineHeight: 1.8,
+      },
+      setReadingSettings: (settings) =>
+        set((state) => ({ readingSettings: { ...state.readingSettings, ...settings } })),
 
-  // Roleplay
-  currentRoleplayStory: null,
-  currentScene: null,
-  roleplayHistory: [],
-  setCurrentRoleplayStory: (story) => {
-    const startScene = story.scenes.find((s) => s.isStart);
-    set({
-      currentRoleplayStory: story,
-      currentScene: startScene || story.scenes[0] || null,
-      roleplayHistory: startScene ? [startScene.id] : [],
-    });
-  },
-  setCurrentScene: (scene) => set((state) => ({ currentScene: scene, roleplayHistory: [...state.roleplayHistory, scene.id] })),
-  addToHistory: (sceneId) => set((state) => ({ roleplayHistory: [...state.roleplayHistory, sceneId] })),
+      // Roleplay
+      currentRoleplayStory: null,
+      currentScene: null,
+      roleplayHistory: [],
+      setCurrentRoleplayStory: (story) => {
+        const startScene = story.scenes.find((s) => s.isStart);
+        set({
+          currentRoleplayStory: story,
+          currentScene: startScene || story.scenes[0] || null,
+          roleplayHistory: startScene ? [startScene.id] : [],
+        });
+      },
+      setCurrentScene: (scene) => set((state) => ({ currentScene: scene, roleplayHistory: [...state.roleplayHistory, scene.id] })),
+      addToHistory: (sceneId) => set((state) => ({ roleplayHistory: [...state.roleplayHistory, sceneId] })),
 
-  // Loading
-  loading: true,
-  setLoading: (loading) => set({ loading }),
+      // Loading
+      loading: true,
+      setLoading: (loading) => set({ loading }),
 
-  // Data
-  novels: [],
-  roleplayStories: [],
-  setNovels: (novels) => set({ novels }),
-  setRoleplayStories: (stories) => set({ roleplayStories: stories }),
-}));
+      // Data
+      novels: [],
+      roleplayStories: [],
+      setNovels: (novels) => set({ novels, loading: false }),
+      setRoleplayStories: (stories) => set({ roleplayStories: stories }),
+    }),
+    {
+      name: 'kathamrut-storage',
+      storage: createJSONStorage(() => {
+        if (typeof window !== 'undefined') return localStorage;
+        return {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+        };
+      }),
+      partialize: (state) => ({
+        bookshelf: state.bookshelf,
+        readingProgress: state.readingProgress,
+        readingSettings: state.readingSettings,
+        languageFilter: state.languageFilter,
+        categoryFilter: state.categoryFilter,
+      }),
+    }
+  )
+);

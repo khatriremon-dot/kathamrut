@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
+
 import {
   Dialog,
   DialogContent,
@@ -56,7 +57,6 @@ import {
   Trash2,
   Upload,
   ChevronLeft,
-  ArrowUpDown,
   GripVertical,
   Loader2,
   LogOut,
@@ -142,7 +142,7 @@ const LANGUAGES = [
 ];
 
 const CATEGORIES = [
-  'fiction', 'mystery', 'romance', 'fantasy', 'scifi',
+  'fiction', 'mystery', 'romance', 'fantasy', 'sci-fi',
   'horror', 'action', 'literary', 'drama', 'historical', 'adventure',
 ];
 
@@ -206,24 +206,58 @@ function SortableChapterRow({
 }
 
 // ─── Admin Page ─────────────────────────────────────────────────────────────
+
+// Authenticated fetch helper - reads stored key from localStorage
+function authFetch(options: RequestInit = {}): RequestInit {
+  let adminKey = '';
+  if (typeof window !== 'undefined') {
+    adminKey = localStorage.getItem('kathamrut_admin_auth') || '';
+  }
+  return {
+    ...options,
+    headers: {
+      ...options.headers,
+      'x-admin-key': adminKey,
+    },
+  };
+}
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('kathamrut_admin_auth') === 'true';
+      const storedAuth = localStorage.getItem('kathamrut_admin_auth');
+      return !!storedAuth;
     }
     return false;
   });
   const [passwordInput, setPasswordInput] = useState('');
   const [showPasswordError, setShowPasswordError] = useState(false);
 
-  const handleLogin = () => {
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'kathamrut2025';
-    if (passwordInput === adminPassword) {
-      localStorage.setItem('kathamrut_admin_auth', 'true');
-      setIsAuthenticated(true);
-      setShowPasswordError(false);
-    } else {
+  const [loginError, setLoginError] = useState('');
+
+  const handleLogin = async () => {
+    // Verify password server-side so it's never in the client bundle
+    setLoginError('');
+    try {
+      const res = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': passwordInput,
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('kathamrut_admin_auth', passwordInput);
+        setIsAuthenticated(true);
+        setShowPasswordError(false);
+      } else {
+        setShowPasswordError(true);
+        setLoginError(data.error || 'Login failed');
+      }
+    } catch (err) {
       setShowPasswordError(true);
+      setLoginError('Network error — could not reach server');
     }
   };
 
@@ -255,7 +289,10 @@ export default function AdminPage() {
               autoFocus
             />
             {showPasswordError && (
-              <p className="text-sm text-destructive">Incorrect password. Please try again.</p>
+              <div className="text-sm text-destructive space-y-1">
+                <p>Incorrect password. Please try again.</p>
+                {loginError && <p className="text-xs opacity-75">Server: {loginError}</p>}
+              </div>
             )}
             <Button onClick={handleLogin} className="w-full bg-amber-600 hover:bg-amber-700 text-white">
               Sign In
@@ -300,7 +337,7 @@ export default function AdminPage() {
               <BookOpen className="w-4 h-4 hidden sm:block" />
               Novels
             </TabsTrigger>
-            <TabsTrigger value="chapters" className="gap-2 text-xs sm:text-sm py-2.5" disabled>
+            <TabsTrigger value="chapters" className="gap-2 text-xs sm:text-sm py-2.5">
               <FileText className="w-4 h-4 hidden sm:block" />
               Chapters
             </TabsTrigger>
@@ -308,7 +345,7 @@ export default function AdminPage() {
               <Swords className="w-4 h-4 hidden sm:block" />
               Roleplay Stories
             </TabsTrigger>
-            <TabsTrigger value="scenes" className="gap-2 text-xs sm:text-sm py-2.5" disabled>
+            <TabsTrigger value="scenes" className="gap-2 text-xs sm:text-sm py-2.5">
               <Map className="w-4 h-4 hidden sm:block" />
               Scenes
             </TabsTrigger>
@@ -419,19 +456,19 @@ function NovelsTab() {
       };
 
       if (editingNovel) {
-        const res = await fetch(`/api/novels/${editingNovel.id}`, {
+        const res = await fetch(`/api/novels/${editingNovel.id}`, authFetch({
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
-        });
+        }));
         if (!res.ok) throw new Error('Update failed');
         toast.success('Novel updated');
       } else {
-        const res = await fetch('/api/novels', {
+        const res = await fetch('/api/novels', authFetch({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
-        });
+        }));
         if (!res.ok) throw new Error('Create failed');
         toast.success('Novel created');
       }
@@ -448,7 +485,7 @@ function NovelsTab() {
     if (!deletingNovel) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/novels/${deletingNovel.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/novels/${deletingNovel.id}`, authFetch({ method: 'DELETE' }));
       if (!res.ok) throw new Error('Delete failed');
       toast.success('Novel deleted');
       setDeleteOpen(false);
@@ -468,7 +505,7 @@ function NovelsTab() {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const res = await fetch('/api/upload', authFetch({ method: 'POST', body: fd }));
       const data = await res.json();
       if (data.url) {
         setFormCoverUrl(data.url);
@@ -762,7 +799,7 @@ function ChaptersTab() {
     setSaving(true);
     try {
       if (editingChapter) {
-        const res = await fetch(`/api/chapters/${editingChapter.id}`, {
+        const res = await fetch(`/api/chapters/${editingChapter.id}`, authFetch({
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -770,11 +807,11 @@ function ChaptersTab() {
             content: formContent,
             number: parseInt(formNumber) || editingChapter.number,
           }),
-        });
+        }));
         if (!res.ok) throw new Error('Update failed');
         toast.success('Chapter updated');
       } else {
-        const res = await fetch(`/api/novels/${novelId}/chapters`, {
+        const res = await fetch(`/api/novels/${novelId}/chapters`, authFetch({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -782,7 +819,7 @@ function ChaptersTab() {
             content: formContent,
             number: parseInt(formNumber) || undefined,
           }),
-        });
+        }));
         if (!res.ok) throw new Error('Create failed');
         toast.success('Chapter created');
       }
@@ -799,7 +836,7 @@ function ChaptersTab() {
     if (!deletingChapter) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/chapters/${deletingChapter.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/chapters/${deletingChapter.id}`, authFetch({ method: 'DELETE' }));
       if (!res.ok) throw new Error('Delete failed');
       toast.success('Chapter deleted');
       setDeleteOpen(false);
@@ -827,11 +864,11 @@ function ChaptersTab() {
     try {
       await Promise.all(
         reordered.map((ch, i) =>
-          fetch(`/api/chapters/${ch.id}`, {
+          fetch(`/api/chapters/${ch.id}`, authFetch({
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ number: i + 1 }),
-          })
+          }))
         )
       );
     } catch {
@@ -1054,19 +1091,19 @@ function StoriesTab() {
         genre: formGenre,
       };
       if (editingStory) {
-        const res = await fetch(`/api/roleplay/${editingStory.id}`, {
+        const res = await fetch(`/api/roleplay/${editingStory.id}`, authFetch({
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
-        });
+        }));
         if (!res.ok) throw new Error('Update failed');
         toast.success('Story updated');
       } else {
-        const res = await fetch('/api/roleplay', {
+        const res = await fetch('/api/roleplay', authFetch({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
-        });
+        }));
         if (!res.ok) throw new Error('Create failed');
         toast.success('Story created');
       }
@@ -1083,7 +1120,7 @@ function StoriesTab() {
     if (!deletingStory) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/roleplay/${deletingStory.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/roleplay/${deletingStory.id}`, authFetch({ method: 'DELETE' }));
       if (!res.ok) throw new Error('Delete failed');
       toast.success('Story deleted');
       setDeleteOpen(false);
@@ -1103,7 +1140,7 @@ function StoriesTab() {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const res = await fetch('/api/upload', authFetch({ method: 'POST', body: fd }));
       const data = await res.json();
       if (data.url) {
         setFormCoverUrl(data.url);
@@ -1383,19 +1420,19 @@ function ScenesTab() {
       };
 
       if (editingScene) {
-        const res = await fetch(`/api/roleplay/scenes/${editingScene.id}`, {
+        const res = await fetch(`/api/roleplay/scenes/${editingScene.id}`, authFetch({
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
-        });
+        }));
         if (!res.ok) throw new Error('Update failed');
         toast.success('Scene updated');
       } else {
-        const res = await fetch(`/api/roleplay/${storyId}/scenes`, {
+        const res = await fetch(`/api/roleplay/${storyId}/scenes`, authFetch({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
-        });
+        }));
         if (!res.ok) throw new Error('Create failed');
         toast.success('Scene created');
       }
@@ -1412,7 +1449,7 @@ function ScenesTab() {
     if (!deletingScene) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/roleplay/scenes/${deletingScene.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/roleplay/scenes/${deletingScene.id}`, authFetch({ method: 'DELETE' }));
       if (!res.ok) throw new Error('Delete failed');
       toast.success('Scene deleted');
       setDeleteOpen(false);
@@ -1432,7 +1469,7 @@ function ScenesTab() {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const res = await fetch('/api/upload', authFetch({ method: 'POST', body: fd }));
       const data = await res.json();
       if (data.url) {
         setFormImageUrl(data.url);
