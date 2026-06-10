@@ -59,3 +59,34 @@ Stage Summary:
 - Choices editor for roleplay scenes with dynamic add/remove
 - All existing GET endpoints preserved and working
 - Admin link added to main site navigation (desktop + mobile)
+
+---
+Task ID: 3
+Agent: infrastructure-setup
+Task: Set up Neon DB, GitHub repo, and Netlify deployment
+
+Work Log:
+- Read existing worklog and .env to understand project state
+- Checked for neonctl CLI availability (available via npx, version 2.24.0)
+- Attempted Neon project creation via neonctl CLI (timed out — no auth configured)
+- Attempted Neon project creation via REST API (returned "supplied credentials do not pass authentication")
+- Confirmed no NEON_API_KEY or neon config exists in environment — manual setup required
+- Read GitHub token from .env and verified GitHub user: khatriremon-dot
+- Created GitHub repository via API: POST https://api.github.com/user/repos — SUCCESS (repo ID: 1264880927)
+- Added git remote origin pointing to the new repo
+- Discovered .env was tracked in git history (push protection violation)
+- Used git filter-branch to remove .env from entire git history (8 commits rewritten)
+- Fixed .gitignore to allow .env.example while keeping .env ignored
+- Created .env.example with placeholder credentials for reference
+- Successfully pushed all code to GitHub (main branch)
+- Created netlify.toml with build config (prisma generate + migrate deploy + build, standalone output, @netlify/plugin-nextjs)
+- Attempted Netlify site creation via API (returned 401 Access Denied — no NETLIFY_AUTH_TOKEN)
+- Committed netlify.toml and pushed to GitHub
+
+Stage Summary:
+- Neon DB: NOT created — requires manual setup (no API key available). See manual steps below.
+- GitHub repo: CREATED — https://github.com/khatriremon-dot/kathamrut (public, 5 commits pushed)
+- Netlify: NOT created — requires manual setup (no auth token). netlify.toml is ready in the repo.
+- Manual steps needed:
+  1. Neon: Create project at https://console.neon.tech, get credentials, update .env, run migrations + seed
+  2. Netlify: Connect repo at https://app.netlify.com, add env vars, deploy

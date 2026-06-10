@@ -106,6 +106,10 @@ interface AppState {
   setCurrentScene: (scene: RoleplayScene) => void;
   addToHistory: (sceneId: string) => void;
 
+  // Loading
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+
   // Data
   novels: Novel[];
   roleplayStories: RoleplayStory[];
@@ -174,6 +178,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   setCurrentScene: (scene) => set((state) => ({ currentScene: scene, roleplayHistory: [...state.roleplayHistory, scene.id] })),
   addToHistory: (sceneId) => set((state) => ({ roleplayHistory: [...state.roleplayHistory, sceneId] })),
+
+  // Loading
+  loading: true,
+  setLoading: (loading) => set({ loading }),
 
   // Data
   novels: [],

@@ -1,0 +1,16 @@
+{
+  "name": "Kathamrut",
+  "short_name": "Kathamrut",
+  "description": "Stories Across Languages — English, Hindi, Nepali",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#d97706",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

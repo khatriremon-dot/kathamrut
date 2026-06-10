@@ -1,5 +1,23 @@
 'use client';
 
+/*
+ * Kathamrut - Main Application Page
+ *
+ * ARCHITECTURE NOTES:
+ * - This is currently a single-page app (SPA) with all views managed via Zustand state.
+ *   For proper SEO and shareability, individual routes should be created:
+ *   TODO: /novel/[id] for novel detail pages with server-side rendering
+ *   TODO: /novel/[id]/chapter/[number] for reader pages
+ *   TODO: /roleplay/[id] for roleplay story detail pages
+ *   TODO: /roleplay/[id]/play for the game view
+ * - The entire page is 'use client' because view switching relies on client-side state.
+ *   Next.js 16's strength is server components - a future refactor should use URL-based
+ *   routing with server components for data fetching where possible.
+ * - No pagination is currently implemented. Fine for 16 novels but should be added
+ *   as the catalog grows.
+ * - Admin routes have NO authentication. This should be addressed before production.
+ */
+
 import { useEffect, useCallback, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore, type Novel, type Chapter, type RoleplayStory, type Choice } from '@/store/app-store';
@@ -19,6 +37,8 @@ import {
   SheetDescription,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { ShareButtons, slugify } from '@/components/share-buttons';
+import { ErrorBoundary } from '@/components/error-boundary';
 import {
   Book,
   Library,
@@ -37,7 +57,19 @@ import {
   RotateCcw,
   Clock,
   Globe,
+  Share2,
 } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { toast } from 'sonner';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 const LANGUAGES = [
@@ -588,6 +620,15 @@ function LibraryView() {
               <Bookmark className={`w-4 h-4 mr-2 ${isInShelf ? 'fill-current' : ''}`} />
               {isInShelf ? 'In Bookshelf' : 'Add to Bookshelf'}
             </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline"><Share2 className="w-4 h-4 mr-2" />Share</Button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-auto">
+                <p className="text-sm font-medium text-muted-foreground mb-2">Share this novel</p>
+                <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/?novel=${encodeURIComponent(slugify(currentNovel.title))}`} title={currentNovel.title} description={currentNovel.description} />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>
@@ -1011,6 +1052,17 @@ function RoleplayView() {
           <Play className="w-5 h-5 mr-2" />
           Begin Adventure
         </Button>
+        <div className="flex justify-center">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm"><Share2 className="w-4 h-4 mr-2" />Share Story</Button>
+            </PopoverTrigger>
+            <PopoverContent align="center" className="w-auto">
+              <p className="text-sm font-medium text-muted-foreground mb-2">Share this story</p>
+              <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/?story=${encodeURIComponent(slugify(currentRoleplayStory.title))}`} title={currentRoleplayStory.title} description={currentRoleplayStory.description} />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
     </div>
   );
