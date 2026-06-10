@@ -3,52 +3,42 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 model Novel {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   author      String
   description String
-  coverUrl    String   @default("")
-  language    String   @default("en")
-  category    String   @default("fiction")
+  coverUrl    String    @default("")
+  language    String    @default("en")
+  category    String    @default("fiction")
   chapters    Chapter[]
-  rating      Float    @default(4.5)
-  views       Int      @default(0)
-  status      String   @default("ongoing")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  rating      Float     @default(4.5)
+  views       Int       @default(0)
+  status      String    @default("ongoing")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([language])
+  @@index([category])
+  @@index([status])
 }
 
 model Chapter {
-  id       String   @id @default(cuid())
-  novelId  String
-  title    String
-  content  String
-  number   Int
-  novel    Novel    @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  novelId   String
+  title     String
+  content   String
+  number    Int
+  novel     Novel   @relation(fields: [novelId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+
+  @@unique([novelId, number])
+  @@index([novelId])
 }
 
 model RoleplayStory {
@@ -61,16 +51,22 @@ model RoleplayStory {
   scenes      RoleplayScene[]
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
+
+  @@index([language])
+  @@index([genre])
 }
 
 model RoleplayScene {
-  id              String            @id @default(cuid())
-  storyId         String
-  title           String
-  narrative       String
-  imageUrl        String            @default("")
-  choices         String            @default("[]")
-  isStart         Boolean           @default(false)
-  story           RoleplayStory     @relation(fields: [storyId], references: [id], onDelete: Cascade)
-  createdAt       DateTime          @default(now())
+  id        String        @id @default(cuid())
+  storyId   String
+  title     String
+  narrative String
+  imageUrl  String        @default("")
+  choices   String        @default("[]")
+  isStart   Boolean       @default(false)
+  story     RoleplayStory @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@index([storyId])
+  @@index([isStart])
 }
