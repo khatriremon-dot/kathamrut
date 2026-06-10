@@ -26,3 +26,39 @@ export async function GET(request: Request) {
 
   return NextResponse.json(novels);
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { title, author, description, coverUrl, language, category, rating, status } = body;
+
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+    }
+    if (!author || typeof author !== 'string' || author.trim().length === 0) {
+      return NextResponse.json({ error: 'Author is required' }, { status: 400 });
+    }
+    if (!description || typeof description !== 'string') {
+      return NextResponse.json({ error: 'Description is required' }, { status: 400 });
+    }
+
+    const novel = await db.novel.create({
+      data: {
+        title: title.trim(),
+        author: author.trim(),
+        description: description.trim(),
+        coverUrl: typeof coverUrl === 'string' ? coverUrl.trim() : '',
+        language: typeof language === 'string' ? language : 'en',
+        category: typeof category === 'string' ? category : 'fiction',
+        rating: typeof rating === 'number' ? Math.min(5, Math.max(0, rating)) : 4.5,
+        status: typeof status === 'string' ? status : 'ongoing',
+      },
+      include: { chapters: { select: { id: true, number: true, title: true }, orderBy: { number: 'asc' } } },
+    });
+
+    return NextResponse.json(novel, { status: 201 });
+  } catch (error) {
+    console.error('Error creating novel:', error);
+    return NextResponse.json({ error: 'Failed to create novel' }, { status: 500 });
+  }
+}
