@@ -59,6 +59,8 @@ import {
   ArrowUpDown,
   GripVertical,
   Loader2,
+  LogOut,
+  Lock,
 } from 'lucide-react';
 import {
   DndContext,
@@ -205,6 +207,71 @@ function SortableChapterRow({
 
 // ─── Admin Page ─────────────────────────────────────────────────────────────
 export default function AdminPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('kathamrut_admin_auth') === 'true';
+    }
+    return false;
+  });
+  const [passwordInput, setPasswordInput] = useState('');
+  const [showPasswordError, setShowPasswordError] = useState(false);
+
+  const handleLogin = () => {
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'kathamrut2025';
+    if (passwordInput === adminPassword) {
+      localStorage.setItem('kathamrut_admin_auth', 'true');
+      setIsAuthenticated(true);
+      setShowPasswordError(false);
+    } else {
+      setShowPasswordError(true);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('kathamrut_admin_auth');
+    setIsAuthenticated(false);
+    setPasswordInput('');
+  };
+
+  // Password gate
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-full max-w-sm space-y-6 p-8">
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8 text-amber-600" />
+            </div>
+            <h1 className="text-2xl font-bold">Admin Access</h1>
+            <p className="text-sm text-muted-foreground mt-1">Enter the admin password to continue</p>
+          </div>
+          <div className="space-y-3">
+            <Input
+              type="password"
+              placeholder="Password"
+              value={passwordInput}
+              onChange={(e) => { setPasswordInput(e.target.value); setShowPasswordError(false); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleLogin(); }}
+              autoFocus
+            />
+            {showPasswordError && (
+              <p className="text-sm text-destructive">Incorrect password. Please try again.</p>
+            )}
+            <Button onClick={handleLogin} className="w-full bg-amber-600 hover:bg-amber-700 text-white">
+              Sign In
+            </Button>
+          </div>
+          <a
+            href="/"
+            className="block text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ← Back to Site
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -218,6 +285,10 @@ export default function AdminPage() {
             <BookOpen className="w-5 h-5 text-amber-600" />
             <h1 className="font-bold text-lg">Admin Dashboard</h1>
           </div>
+          <Button variant="ghost" size="sm" className="ml-auto gap-2 text-muted-foreground hover:text-destructive" onClick={handleLogout}>
+            <LogOut className="w-4 h-4" />
+            <span className="hidden sm:inline">Logout</span>
+          </Button>
         </div>
       </header>
 

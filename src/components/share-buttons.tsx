@@ -1,6 +1,6 @@
 "use client";
 
-import { Twitter, Facebook, MessageCircle, Send, Link2 } from "lucide-react";
+import { Twitter, Facebook, MessageCircle, Send, Link2, Linkedin, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface ShareButtonsProps {
@@ -46,7 +46,36 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
       href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`,
       color: "hover:bg-sky-50 dark:hover:bg-sky-950/30",
     },
+    {
+      name: "LinkedIn",
+      icon: Linkedin,
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      color: "hover:bg-sky-50 dark:hover:bg-sky-950/30",
+    },
+    {
+      name: "Reddit",
+      icon: Share2,
+      href: `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(title)}`,
+      color: "hover:bg-orange-50 dark:hover:bg-orange-950/30",
+    },
   ];
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text: description || title,
+          url: shareUrl,
+        });
+      } catch (err) {
+        // User cancelled or share failed - silently ignore abort
+        if ((err as DOMException)?.name !== 'AbortError') {
+          toast.error("Could not share");
+        }
+      }
+    }
+  };
 
   const copyLink = async () => {
     try {
@@ -57,8 +86,22 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
     }
   };
 
+  const canNativeShare = typeof navigator !== "undefined" && !!navigator.share;
+
   return (
     <div className="space-y-0.5">
+      {canNativeShare && (
+        <>
+          <button
+            onClick={handleNativeShare}
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm transition-colors hover:bg-amber-50 dark:hover:bg-amber-950/30 font-medium text-amber-700 dark:text-amber-400"
+          >
+            <Share2 className="w-4 h-4" />
+            Share via...
+          </button>
+          <div className="border-t my-1" />
+        </>
+      )}
       {shareLinks.map((link) => {
         const Icon = link.icon;
         return (

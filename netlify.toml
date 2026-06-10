@@ -1,9 +1,9 @@
 [build]
   command = "npx prisma generate && npx prisma migrate deploy && npm run build"
-  publish = ".next/standalone"
+  publish = ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-[functions]
-  node_bundler = "bun"
+[images]
+  remote_images = ["https://ep-hidden-dew-aqn81atd.c-8.us-east-1.aws.neon.tech/**", "https://*.netlify.app/**"]

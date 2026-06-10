@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { rateLimit, validateJsonRequest } from '@/lib/api-security';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -19,6 +20,12 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const rateResult = rateLimit(request, { windowMs: 60000, maxRequests: 30 });
+  if (rateResult) return rateResult;
+
+  const validationError = await validateJsonRequest(request);
+  if (validationError) return validationError;
+
   try {
     const body = await request.json();
     const { title, description, coverUrl, language, genre } = body;

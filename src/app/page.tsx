@@ -58,6 +58,7 @@ import {
   Clock,
   Globe,
   Share2,
+  Linkedin,
 } from 'lucide-react';
 import {
   Popover,
@@ -444,6 +445,22 @@ function NovelCard({ novel, onClick }: { novel: Novel; onClick: () => void }) {
       >
         <div className="relative h-32 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20 flex items-center justify-center overflow-hidden">
           <Book className="w-12 h-12 text-amber-600/40 group-hover:scale-110 transition-transform" />
+          <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className="p-1.5 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm shadow-sm hover:bg-white dark:hover:bg-black/90 transition-colors"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-foreground" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-auto">
+                <p className="text-sm font-medium text-muted-foreground mb-2">Share this novel</p>
+                <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/novel/${slugify(novel.title)}`} title={novel.title} description={novel.description} />
+              </PopoverContent>
+            </Popover>
+          </div>
           <div className="absolute top-2 right-2 flex gap-1">
             <Badge variant="secondary" className="text-xs bg-white/80 dark:bg-black/50 backdrop-blur-sm">
               {LANGUAGE_LABELS[novel.language] || novel.language}
@@ -1151,9 +1168,22 @@ function RoleplayGameView() {
           <ChevronLeft className="w-4 h-4" />
           {currentRoleplayStory.title}
         </button>
-        <Badge className="bg-purple-500/50 text-purple-200 border-purple-400/30">
-          {roleplayHistory.length} steps
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors">
+                <Share2 className="w-4 h-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-auto">
+              <p className="text-sm font-medium text-muted-foreground mb-2">Share this adventure</p>
+              <ShareButtons url={`${typeof window !== 'undefined' ? window.location.origin : ''}/roleplay/${slugify(currentRoleplayStory.title)}`} title={currentRoleplayStory.title} description={currentRoleplayStory.description} />
+            </PopoverContent>
+          </Popover>
+          <Badge className="bg-purple-500/50 text-purple-200 border-purple-400/30">
+            {roleplayHistory.length} steps
+          </Badge>
+        </div>
       </div>
 
       {/* Progress indicator */}

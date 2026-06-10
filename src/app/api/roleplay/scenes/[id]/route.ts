@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { rateLimit, validateJsonRequest } from '@/lib/api-security';
 
 export async function GET(
   request: Request,
@@ -21,6 +22,12 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const rateResult = rateLimit(request, { windowMs: 60000, maxRequests: 30 });
+  if (rateResult) return rateResult;
+
+  const validationError = await validateJsonRequest(request);
+  if (validationError) return validationError;
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -56,6 +63,9 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const rateResult = rateLimit(request, { windowMs: 60000, maxRequests: 30 });
+  if (rateResult) return rateResult;
+
   try {
     const { id } = await params;
 
