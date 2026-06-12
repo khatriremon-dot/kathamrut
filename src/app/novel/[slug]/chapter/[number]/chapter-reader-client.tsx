@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Settings, Sun, Moon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Settings, Sun, Moon, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/sheet';
 import { Navbar } from '@/components/navbar';
 import { useAppStore, type Novel, type Chapter } from '@/store/app-store';
-import { slugify } from '@/components/share-buttons';
+import { ShareButtons, slugify } from '@/components/share-buttons';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 // ─── Reading theme colors (same 5 as ReaderView in page.tsx) ─────────────────
 const THEME_COLORS: Record<string, { bg: string; text: string; label: string; icon: React.ReactNode }> = {
@@ -132,13 +133,30 @@ export default function ChapterReaderClient({ novel: initialNovel, chapter: init
         <div className="flex flex-col h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
           {/* Back button + title + settings */}
           <div className="flex items-center justify-between mb-4 flex-shrink-0">
-            <button
-              onClick={() => { setView('library'); router.push(`/novel/${novelSlug}`); }}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              {initialNovel.title}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setView('library'); router.push(`/novel/${novelSlug}`); }}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                {initialNovel.title}
+              </button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="w-9 h-9">
+                    <Share2 className="w-4 h-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-auto">
+                  <p className="text-sm font-medium text-muted-foreground mb-2">Share this chapter</p>
+                  <ShareButtons
+                    url={`/novel/${novelSlug}/chapter/${chapter.number}`}
+                    title={`${initialNovel.title} — ${chapter.title}`}
+                    description={chapter.content?.substring(0, 200) || `Chapter ${chapter.number} of ${initialNovel.title}`}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
             <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="w-9 h-9">
@@ -254,7 +272,7 @@ export default function ChapterReaderClient({ novel: initialNovel, chapter: init
             </div>
           </div>
 
-          {/* Bottom Toolbar — Previous / Next with real URLs */}
+          {/* Bottom Toolbar — Previous / Share / Next with real URLs */}
           <div className="flex-shrink-0 mt-4 flex items-center justify-between bg-muted/50 rounded-lg p-3">
             {prevChapter ? (
               <Link href={`/novel/${novelSlug}/chapter/${prevChapter.number}`}>

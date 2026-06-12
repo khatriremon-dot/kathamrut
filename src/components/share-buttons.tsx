@@ -18,8 +18,16 @@ export function slugify(text: string): string {
     .trim();
 }
 
+/** Convert relative URLs (e.g. /novel/slug) to absolute URLs using the current origin */
+function resolveUrl(url: string): string {
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (typeof window === "undefined") return url;
+  return new URL(url, window.location.origin).href;
+}
+
 export function ShareButtons({ url, title, description }: ShareButtonsProps) {
-  const shareUrl = url || (typeof window !== "undefined" ? window.location.href : "");
+  const rawUrl = url || (typeof window !== "undefined" ? window.location.href : "");
+  const shareUrl = resolveUrl(rawUrl);
 
   const shareLinks = [
     {
@@ -110,6 +118,16 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => {
+              // On desktop, open share URLs in a small centered popup
+              if (!window.navigator.share) {
+                e.preventDefault();
+                const w = 600, h = 500;
+                const left = (window.screen.width - w) / 2;
+                const top = (window.screen.height - h) / 2;
+                window.open(link.href, link.name, `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+              }
+            }}
             className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm transition-colors ${link.color}`}
           >
             <Icon className="w-4 h-4" />

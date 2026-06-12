@@ -248,19 +248,35 @@ export default function NovelDetailClient({ novel: initialNovel }: { novel: Nove
             ) : (
               <div className="space-y-1 max-h-96 overflow-y-auto custom-scrollbar rounded-lg border">
                 {initialNovel.chapters.map((chapter) => (
-                  <button
-                    key={chapter.id}
-                    onClick={() => handleChapterClick(chapter.id, chapter.number)}
-                    className="w-full flex items-center gap-4 p-3 hover:bg-muted/50 transition-colors text-left group"
-                  >
-                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 text-xs font-bold flex items-center justify-center">
-                      {chapter.number}
-                    </span>
-                    <span className="flex-1 text-sm font-medium truncate group-hover:text-amber-600 transition-colors">
-                      {chapter.title}
-                    </span>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-amber-600 transition-colors" />
-                  </button>
+                  <div key={chapter.id} className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleChapterClick(chapter.id, chapter.number)}
+                      className="flex-1 flex items-center gap-4 p-3 hover:bg-muted/50 transition-colors text-left group"
+                    >
+                      <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 text-xs font-bold flex items-center justify-center">
+                        {chapter.number}
+                      </span>
+                      <span className="flex-1 text-sm font-medium truncate group-hover:text-amber-600 transition-colors">
+                        {chapter.title}
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-amber-600 transition-colors" />
+                    </button>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                          <Share2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent align="end" className="w-auto">
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Share chapter {chapter.number}</p>
+                        <ShareButtons
+                          url={`/novel/${slug}/chapter/${chapter.number}`}
+                          title={`${initialNovel.title} — ${chapter.title}`}
+                          description={`Read "${chapter.title}" from ${initialNovel.title} on Kathamrut`}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 ))}
               </div>
             )}

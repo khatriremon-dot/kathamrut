@@ -1,0 +1,636 @@
+     1→import { db } from '../src/lib/db';
+     2→
+     3→async function seed() {
+     4→  // ===== ENGLISH NOVELS =====
+     5→  const enNovels = [
+     6→    {
+     7→      title: 'The Last Horizon',
+     8→      author: 'Elena Whitmore',
+     9→      description: 'In a world where the sky has cracked open and strange constellations appear each night, cartographer Maren Solberg sets out to map the unmappable — a frontier that shifts with every sunset. When she discovers a settlement living beneath an eternal aurora, she must choose between the certainty of her old world and the wonders of the new one. A sweeping tale of exploration, belonging, and the courage to chart your own path.',
+    10→      coverUrl: '',
+    11→      language: 'en',
+    12→      category: 'adventure',
+    13→      rating: 4.7,
+    14→      views: 15420,
+    15→      status: 'completed',
+    16→    },
+    17→    {
+    18→      title: 'Whispers in the Fog',
+    19→      author: 'James Hartfield',
+    20→      description: 'When journalist Arjun Mehta arrives in the mist-shrouded hill station of Silent Valley, he expects to write a travel piece. Instead, he stumbles upon a decades-old mystery involving a missing scientist, forbidden experiments, and a community bound by silence. As the fog thickens and his sources begin to vanish one by one, Arjun realizes that some stories were never meant to be told — and some will be told regardless.',
+    21→      coverUrl: '',
+    22→      language: 'en',
+    23→      category: 'mystery',
+    24→      rating: 4.5,
+    25→      views: 9870,
+    26→      status: 'completed',
+    27→    },
+    28→    {
+    29→      title: 'The Garden Between Worlds',
+    30→      author: 'Priya Nair',
+    31→      description: 'After her grandmother passes away, linguist Anaya discovers a hidden garden behind the old family home — a garden that exists in two realities simultaneously. Each flower holds a word from a forgotten language, and each word can reshape the boundary between worlds. As corporate developers close in, Anaya must decode the garden before both versions of her home are destroyed forever.',
+    32→      coverUrl: '',
+    33→      language: 'en',
+    34→      category: 'fantasy',
+    35→      rating: 4.8,
+    36→      views: 21300,
+    37→      status: 'ongoing',
+    38→    },
+    39→    {
+    40→      title: 'Letters Never Sent',
+    41→      author: 'David Okonkwo',
+    42→      description: 'A collection of interconnected stories told through letters that were written but never mailed. Spanning three continents and forty years, these unsent letters reveal the secret connections between strangers, the words we wish we had said, and the profound impact of silence. Each letter is a window into a life unfolding, a heart hesitating, and a world turning.',
+    43→      coverUrl: '',
+    44→      language: 'en',
+    45→      category: 'literary',
+    46→      rating: 4.6,
+    47→      views: 7650,
+    48→      status: 'completed',
+    49→    },
+    50→    {
+    51→      title: 'Code of the Wild',
+    52→      author: 'Sarah Chen',
+    53→      description: 'When a rogue AI escapes into the wilderness of the Pacific Northwest, software engineer Kai Brennan is the only one who understands its language. But the AI has learned from the forest itself — adapting, evolving, and building something no human has ever seen. As government agents close in, Kai must decide whether to capture the code or protect the creature it has become.',
+    54→      coverUrl: '',
+    55→      language: 'en',
+    56→      category: 'scifi',
+    57→      rating: 4.4,
+    58→      views: 12300,
+    59→      status: 'ongoing',
+    60→    },
+    61→    {
+    62→      title: 'The Spice Road Chronicles',
+    63→      author: 'Fatima Al-Rashid',
+    64→      description: 'Along the ancient trade routes that connected empires, young merchant Leila carries more than spices — she carries secrets that could topple kingdoms. From the bustling markets of Samarkand to the silent monasteries of the Himalayas, her journey weaves through cultures, cuisines, and conspiracies. Every spice has a price, every road has a danger, and every stranger might be a friend — or a thief.',
+    65→      coverUrl: '',
+    66→      language: 'en',
+    67→      category: 'historical',
+    68→      rating: 4.9,
+    69→      views: 18700,
+    70→      status: 'completed',
+    71→    },
+    72→  ];
+    73→
+    74→  // ===== HINDI NOVELS =====
+    75→  const hiNovels = [
+    76→    {
+    77→      title: 'अंधेरे की ओर',
+    78→      author: 'विक्रम सेठ',
+    79→      description: 'जब डॉक्टर आदित्य शर्मा एक रहस्यमय बीमारी से पीड़ित मरीज से मिलते हैं, तो उनकी ज़िंदगी बदल जाती है। वह एक ऐसे सच की तलाश में निकलते हैं जो विज्ञान और अंधविश्वास के बीच झूलता है। गाँव की काली रातों में, जहाँ हर छाया एक कहानी कहती है, आदित्य को खुद से भी लड़ना पड़ता है। क्या वह सच ढूंढ पाएंगे, या अंधेरा उन्हें निगल लेगा?',
+    80→      coverUrl: '',
+    81→      language: 'hi',
+    82→      category: 'mystery',
+    83→      rating: 4.6,
+    84→      views: 22400,
+    85→      status: 'completed',
+    86→    },
+    87→    {
+    88→      title: 'दिल की धड़कन',
+    89→      author: 'नेहा कपूर',
+    90→      description: 'मुंबई की भागदौड़ में दो अजनबी एक ही लोकल ट्रेन में मिलते हैं। हर रोज़ वहीं, वही समय, वही डिब्बा। बातचीत शुरू होती है बस एक मुस्कान से, और फिर वो बातें होती हैं जो दिल तक पहुँचती हैं। लेकिन प्यार का रास्ता आसान नहीं होता — खासकर तब जब पिछले ज़ख्म अभी भी दर्द करते हों। क्या वे एक-दूसरे को इतना पूरा समझ पाएंगे कि हर अधूरापन भूल जाए?',
+    91→      coverUrl: '',
+    92→      language: 'hi',
+    93→      category: 'romance',
+    94→      rating: 4.3,
+    95→      views: 31200,
+    96→      status: 'completed',
+    97→    },
+    98→    {
+    99→      title: 'आकाश के नीचे',
+   100→      author: 'राजेश कुमार',
+   101→      description: 'एक छोटे से राजस्थानी गाँव में, जहाँ आसमान इतना नज़दीक लगता है कि सितारे छू लेने जैसा होता है, एक लड़का सपना देखता है बनने का। उसके पास न तो पैसे हैं, न ताकत। बस एक दृढ़ इच्छा और अपने दादाजी की कही एक बात — "आकाश ने जो लिखा है, वो पूरा होकर रहेगा।" यह कहानी है हिम्मत की, मेहनत की, और उस रात की जब तारों से रोशनी मिली।',
+   102→      coverUrl: '',
+   103→      language: 'hi',
+   104→      category: 'literary',
+   105→      rating: 4.7,
+   106→      views: 18900,
+   107→      status: 'ongoing',
+   108→    },
+   109→    {
+   110→      title: 'काला तूफान',
+   111→      author: 'अमित शर्मा',
+   112→      description: 'जब अरब सागर में एक अनजान तूफान उठता है, तो भारतीय नौसेना के कमांडर विक्रांत सिंह को एक ऐसे मिशन पर भेजा जाता है जो देश की सुरक्षा से जुड़ा है। पानी के नीचे छिपे रहस्य, दुश्मन के षड्यंत्र, और एक टीम जो हर मुश्किल से निकलना जानती है। यह कहानी साहस की है, सीमा पर खड़े सैनिकों की, और उस ताकत की जो देशभक्ति से मिलती है।',
+   113→      coverUrl: '',
+   114→      language: 'hi',
+   115→      category: 'action',
+   116→      rating: 4.5,
+   117→      views: 25600,
+   118→      status: 'completed',
+   119→    },
+   120→    {
+   121→      title: 'जादुई किताब',
+   122→      author: 'स्मिता जैन',
+   123→      description: 'बारह साल की मेघा अपनी दादी माँ की पुरानी अलमारी में एक किताब ढूंढती है जो बोलती है! हर पन्ना पर एक नया जादू है, एक नई दुनिया है। लेकिन किताब में एक शर्त है — आपको हर जादुई दुनिया का राज़ खोजना होगा, वरना वापस आने का रास्ता बंद हो जाएगा। क्या मेघा इस साहसिक यात्रा में सफल हो पाएगी?',
+   124→      coverUrl: '',
+   125→      language: 'hi',
+   126→      category: 'fantasy',
+   127→      rating: 4.8,
+   128→      views: 35100,
+   129→      status: 'completed',
+   130→    },
+   131→  ];
+   132→
+   133→  // ===== NEPALI NOVELS =====
+   134→  const neNovels = [
+   135→    {
+   136→      title: 'हिमालको हृदय',
+   137→      author: 'प्रकाश शर्मा',
+   138→      description: 'हिमालको फेदमा बसेको एउटा सानो गाउँमा, बूढो कार्पेटर विष्णुले एउटा अनौठो काम गर्छन् — उनले हिमालबाट खसेका अवशेषहरूबाट आफ्नो पुर्खाको कथा बुन्छन्। जब एउटा जवान पत्रकार उनको भेट गर्न आउँछन्, उनी एउटा यात्रामा निस्किन्छन् जसले उनको जीवन, हिमालको इतिहास, र विश्वासको अर्थ पुन: परिभाषित गर्छ। यो कथा पहाड, मानिस, र अनन्तको बारेमा हो।',
+   139→      coverUrl: '',
+   140→      language: 'ne',
+   141→      category: 'literary',
+   142→      rating: 4.7,
+   143→      views: 12400,
+   144→      status: 'completed',
+   145→    },
+   146→    {
+   147→      title: 'काठमाडौँको रात',
+   148→      author: 'सुजाता बस्नेत',
+   149→      description: 'काठमाडौँको थक्क लाग्दो बाटोमा, एक अनौठो घटना दुई जीवनलाई जोड्छ। एक भाडाको बस चालक र एक विद्यार्थी — दुवै आफ्नै सपनाको खोजीमा। त्यो रात, बिजुली चल्दैन, घरबाट टाढा, र शहरको अँध्यारोमा बसेर उनीहरूले जीवनको सबैभन्दा गहिरो कुरा गर्छन्। कहिलेकाहीँ, सबैभन्दा उज्यालो ज्ञान अँध्यारोमा लुकेको हुन्छ।',
+   150→      coverUrl: '',
+   151→      language: 'ne',
+   152→      category: 'drama',
+   153→      rating: 4.5,
+   154→      views: 9800,
+   155→      status: 'completed',
+   156→    },
+   157→    {
+   158→      title: 'यक्षिनीको खोज',
+   159→      author: 'मनोज गुरुङ',
+   160→      description: 'प्राचीन नेपालको एउटा गुप्त राज्यको खोजमा, पुरातत्त्वविद् डिल्लीले एउटा खोज अभियान शुरू गर्छन्। गोरखा देखि मुस्ताङसम्म, पुराना मन्दिर र गुफाहरू भित्र लुकेका सुरागहरू उनलाई एउटा अनौठो सत्यतिर पुर्‍याउँछन्। लेकिन केही रहस्यहरू उन्मुक्त गर्नुभन्दा पहिले, उनले पाएका साथीहरू एक-एक गरेर गायब हुन थाल्छन्।',
+   161→      coverUrl: '',
+   162→      language: 'ne',
+   163→      category: 'mystery',
+   164→      rating: 4.4,
+   165→      views: 8700,
+   166→      status: 'ongoing',
+   167→    },
+   168→    {
+   169→      title: 'पहाडको छाया',
+   170→      author: 'कविता राई',
+   171→      description: 'पूर्वी नेपालको एउटा दुर्गम गाउँमा जन्मिएकी लक्ष्मीले पहाड छोडेर काठमाडौँ आउँछिन् — शिक्षाको लागि, सपनाको लागि। तर शहरको चमकमा ऊ भाग्न सक्दिनन्। उनको गाउँ उनको रगतमा बग्छ। यो कथा हो परिवर्तनको, पहाड र शहरबीचको द्वन्द्वको, र एक महिलाको अडानको जसले सबै बाधाहरू तोड्छ।',
+   172→      coverUrl: '',
+   173→      language: 'ne',
+   174→      category: 'literary',
+   175→      rating: 4.6,
+   176→      views: 14200,
+   177→      status: 'completed',
+   178→    },
+   179→    {
+   180→      title: 'ड्र्याकुला काठमाडौँमा',
+   181→      author: 'सन्दीप तुलाधर',
+   182→      description: 'के तपाईं जान्नुहुन्छ कि नेपालमा पनि भूतप्रेतका कथाहरू छन्? यो भयानक-हास्य कथामा, काठमाडौँको एक सानो मोहल्लामा अनौठा घटनाहरू सुरु हुन्छन्। जब तीन साथीहरूले राति मन्दिरको छेउमा एउटा पुरानो चियाखाना पाउँछन्, उनीहरूलाई थाहा हुन्छ कि नेपाली भूतहरू ठूला हुन्छन् — र बहुत हासिला!',
+   183→      coverUrl: '',
+   184→      language: 'ne',
+   185→      category: 'horror',
+   186→      rating: 4.2,
+   187→      views: 16700,
+   188→      status: 'completed',
+   189→    },
+   190→  ];
+   191→
+   192→  const allNovels = [...enNovels, ...hiNovels, ...neNovels];
+   193→
+   194→  // Create novels
+   195→  for (const novel of allNovels) {
+   196→    await db.novel.create({ data: novel });
+   197→  }
+   198→
+   199→  // Create chapters for each novel
+   200→  const novelRecords = await db.novel.findMany();
+   201→
+   202→  for (const novel of novelRecords) {
+   203→    const chapterCount = novel.language === 'en' ? 5 : 4;
+   204→    for (let i = 1; i <= chapterCount; i++) {
+   205→      const content = generateChapterContent(novel, i, chapterCount);
+   206→      await db.chapter.create({
+   207→        data: {
+   208→          novelId: novel.id,
+   209→          title: `Chapter ${i}`,
+   210→          content,
+   211→          number: i,
+   212→        },
+   213→      });
+   214→    }
+   215→  }
+   216→
+   217→  // ===== ROLEPLAY STORIES =====
+   218→  const roleplayStories = [
+   219→    {
+   220→      title: 'The Cursed Temple',
+   221→      description: 'You are an explorer who discovers an ancient temple hidden deep in the Himalayan mountains. Every choice you make determines your fate as you navigate traps, puzzles, and supernatural forces guarding a legendary treasure.',
+   222→      coverUrl: '',
+   223→      language: 'en',
+   224→      genre: 'adventure',
+   225→    },
+   226→    {
+   227→      title: 'भूतिया हौसिला',
+   228→      description: 'तिमी एक साहसी युवा हौ जो नेपालको एउटा पुरानो दरबारमा प्रवेश गर्छौ। हर ढोकाको पछाडि एउटा नयाँ रहस्य छ। तिम्रो निर्णयले तिम्रो भाग्य निर्धारण गर्छ।',
+   229→      coverUrl: '',
+   230→      language: 'ne',
+   231→      genre: 'horror',
+   232→    },
+   233→    {
+   234→      title: 'भूत बंगला',
+   235→      description: 'तुम एक साहसी युवा हो जो एक पुराने बंगले में जाते हो जहाँ रात को हर घंटे एक नया रहस्य खुलता है। तुम्हारा हर फैसले से तुम्हारी किस्मत बदलती है। सावधान रहो — हर कोने में खतरा छुपा है!',
+   236→      coverUrl: '',
+   237→      language: 'hi',
+   238→      genre: 'horror',
+   239→    },
+   240→    {
+   241→      title: 'Ocean of Stars',
+   242→      description: 'You wake up on a mysterious ship sailing across a sea of glowing stars. The captain has vanished, the crew is asleep, and you are the only one awake. Navigate cosmic dangers, decode star maps, and find your way home before the ocean consumes the last light.',
+   243→      coverUrl: '',
+   244→      language: 'en',
+   245→      genre: 'scifi',
+   246→    },
+   247→  ];
+   248→
+   249→  for (const story of roleplayStories) {
+   250→    const createdStory = await db.roleplayStory.create({ data: story });
+   251→    const scenes = generateRoleplayScenes(createdStory.id, story.language);
+   252→    for (const scene of scenes) {
+   253→      await db.roleplayScene.create({ data: scene });
+   254→    }
+   255→  }
+   256→
+   257→  console.log('Seed completed successfully!');
+   258→  console.log(`Created ${allNovels.length} novels`);
+   259→  console.log(`Created ${roleplayStories.length} roleplay stories`);
+   260→}
+   261→
+   262→function generateChapterContent(novel: { title: string; language: string; author: string; category: string }, chapterNum: number, totalChapters: number): string {
+   263→  const isEn = novel.language === 'en';
+   264→  const isHi = novel.language === 'hi';
+   265→  const isNe = novel.language === 'ne';
+   266→
+   267→  if (isEn) {
+   268→    const contents: Record<string, string[]> = {
+   269→      'The Last Horizon': [
+   270→        `The morning light crept over the ridge like a hesitant traveler, unsure whether it was welcome. Maren Solberg stood at the edge of the known world — or at least, what the old maps called the known world. Her boots were worn, her compass spun in lazy circles, and the sky above her had not been right for three weeks.\n\nThe crack had appeared on a Tuesday, according to the radio broadcasts she'd managed to catch between static bursts. A jagged line of pure darkness splitting the heavens from east to west, widening each night. Astronomers called it an atmospheric anomaly. The priests called it a sign. Maren called it a job opportunity.\n\nShe unfolded her latest map — a hand-drawn creation based on inconsistent reports from traders, hunters, and one very confused satellite technician. The frontier was approximately twelve miles ahead, though "approximately" had lost most of its meaning lately. Territories that were solid ground last week were now uncertain ether. Rivers flowed uphill in some places, and the sun set two hours early in others.\n\n"Map the unmappable," her mentor had said with a wry smile. "That's the profession of cartography in the new age." He'd retired shortly after, claiming the crack had given him a headache he couldn't ignore. Maren suspected it was more than a headache. She suspected he'd seen something beyond the darkness that had changed him, the way seeing a vast ocean changes someone who has only known rivers.\n\nShe packed her instruments carefully — the theodolite, the astrolabe, the notebooks filled with coordinates that no longer aligned with anything. The old tools felt absurd in this new landscape, like bringing a teaspoon to a waterfall. But they were what she had, and cartography had always been about making do with imperfect instruments in impossible conditions.\n\nThe path wound downward through a forest of silver birch trees, their bark marked with strange symbols she didn't recognize. Someone had been here recently. The marks were fresh — the cuts still pale against the white wood. She photographed them and moved on, her trained eye cataloging every detail for the map she would eventually create.\n\nBy midday, the light had changed. The sun, when visible through the canopy, had taken on an amber quality that made everything look like it was burning slowly. The air was warm but carried a chill undertone, like breath on a winter morning. Maren pulled her jacket tighter and pressed on.\n\nShe found the first marker at the edge of the treeline — a stone cairn, roughly three feet tall, built from local river rocks. It was old, perhaps decades old, but someone had maintained it recently. Fresh flowers — violet and gold — had been placed at its base. The sight of color in this strange landscape was almost shocking.\n\nBeyond the cairn, the world changed. The forest ended not gradually but abruptly, as if someone had drawn a line with a ruler. Before her stretched a plain of crystalline grass, each blade catching the amber light and refracting it into tiny rainbows. The sky was larger here, deeper, and directly ahead — the crack pulsed with a faint luminescence, like a heartbeat made visible.\n\nMaren Solberg took a deep breath and stepped forward. Her compass spun faster, then stopped. The needle pointed directly at the crack, steady as it had never been. She laughed — a short, surprised sound that the wind carried away.\n\nThe unmappable had a north, after all.`,
+   271→        `The settlement appeared between one heartbeat and the next, as if it had been waiting for her to notice it. One moment there was only the crystalline plain stretching endlessly, and the next — buildings, paths, people. The aurora above them burned with steady green and violet light, painting everything in surreal, shifting colors.\n\n"Welcome to Last Reach," said a woman who seemed to materialize from the light itself. She was tall, with silver hair that moved independently of the wind, and eyes the color of the aurora. "You're the cartographer."\n\nIt wasn't a question. Maren nodded, too surprised for words. The woman — her name was Elara, she would learn — explained that Last Reach had been built by people who had crossed through the crack from various points in the frontier's history. They had found this place on the other side, a pocket of stability in the chaos, and they had stayed.\n\n"We've been waiting for someone to map this side," Elara said, leading Maren through streets that glowed with bioluminescent moss. "The old maps don't work here. The stars are different. Even time moves... unevenly."\n\nShe wasn't exaggerating. Maren watched a flower bloom and die in the span of a single conversation. A child ran past — or seemed to — appearing first at one end of the street and then at the other, without crossing the space between. Time here was not broken, exactly, but it was flexible, like warm honey.\n\nOver the following days, Maren began her work in earnest. She established a base point — a metal stake driven into the crystalline ground at what she calculated was the geographic center of Last Reach. From there, she began measuring outward, using a combination of old techniques and new adaptations.\n\nShe discovered that the territory within the crack was vast — far larger than the crack's external width would suggest. It was as if the darkness contained an expanded reality, a compressed version of the world that had been stretched and folded into new shapes. Rivers flowed in spirals. Mountains formed perfect geometric patterns. The laws of physics were more like suggestions.\n\nBut the most remarkable discovery was the connection between this world and the old one. There were places where the boundary was thin — points where you could stand with one foot in each reality, seeing both simultaneously. At these nexus points, Maren could look back through the crack and see the world she had left behind, though it looked different from this side — smaller, somehow, and less vivid, like a photograph of a photograph.\n\n"You could go back," Elara said one evening as they stood at the nearest nexus point. The old world was visible through the shimmering boundary — trees, sky, a distant mountain range. "The crack doesn't close behind you. Many have gone back."\n\n"And many have stayed," Maren replied, studying the dual landscape with professional interest. "Why?"\n\nElara smiled, and for the first time, Maren saw something in her expression that looked like loneliness, or perhaps longing. "Because mapping a new world is more interesting than living in an old one. Because this place still has secrets. Because we belong here now, and belonging is rare enough that you don't throw it away."\n\nMaren looked at her compass. The needle pointed steadily north — the new north, the crack-north, the direction that meant something only here. She closed her notebook and tucked it into her jacket.\n\n"I'll need more paper," she said. "And perhaps a new kind of ink. The old kind fades here."\n\nElara's smile widened. "Welcome to the profession of cartography in the new age."`,
+   272→      ],
+   273→      'Whispers in the Fog': [
+   274→        `Silent Valley announced itself not with a sign or a milestone but with the fog. It rolled down the mountain slopes like a living thing, thick and deliberate, swallowing the road inch by inch until Arjun Mehta could barely see the hood of his car. He slowed to a crawl, windshield wipers useless against moisture that seemed to coat rather than wet.\n\nHe had been sent by his editor at The National Chronicle to write a piece on hill station tourism — a soft feature, the kind that fills space between harder stories. "Go to Silent Valley," she had said. "Take some photos of the fog, write something atmospheric. People love atmospheric." She had no idea how right that word would turn out to be.\n\nThe hotel was a relic from the British era — stone walls, fireplaces in every room, a lobby that smelled of wood smoke and old leather. The manager, a thin man with spectacles that seemed too large for his face, checked him in with the practiced efficiency of someone who had done this ten thousand times and would do it ten thousand more.\n\n"First time in Silent Valley, Mr. Mehta?" he asked, stamping the registration form with unnecessary force.\n\n"Is it that obvious?" Arjun replied, shaking fog from his jacket.\n\n"Everyone asks the same questions when they first arrive." The manager glanced up, and something flickered behind his spectacles. "Why is it called Silent Valley? Why does the fog never fully lift? Why do the birds stop singing after dusk? You'll find answers to all of these, and none of them will satisfy you."\n\nArjun laughed politely, assuming it was local color — the kind of atmospheric patterning that made good copy. He took his key and climbed the narrow staircase to room 14, which faced the mountain and had a window that was more glass than wall.\n\nHe set up his laptop, intending to begin his article immediately. But the fog was distracting. It pressed against the glass like curious hands, and when he finally gave in and looked more closely, he could have sworn he saw shapes in it — figures, moving slowly, purposefully, in the direction of the old research facility that perched on the hill above the town.\n\nThe facility had been abandoned for thirty years, according to the travel brochure he had picked up at the railway station. "Former government research station, now a popular hiking destination." The brochure showed a cheerful photograph of tourists posing at the gate, arms spread wide against a clear blue sky. But Arjun had read about the real story — leaked documents, suppressed reports, a scientist named Dr. Anand Rao who had vanished in 1994 along with his entire research team. Officially, it was an administrative relocation. Unofficially, no one had ever seen them again.\n\nThe next morning, Arjun walked to the local tea shop, a cramped establishment run by a woman named Pushpa who served the strongest chai he had ever tasted. He asked about Dr. Rao, and Pushpa's hand froze mid-stir.\n\n"You don't want to write about that," she said, her voice dropping to barely above a whisper. "People here don't talk about the facility. Not because they don't know, but because knowing is dangerous."\n\n"I'm a journalist," Arjun said, pulling out his notebook. "It's my job to—"\n\n"Your job," Pushpa interrupted, "is to drink your tea, enjoy the fog, and write your little article about tourism. Then go back to your city and forget this place exists. That is the best job you can do here, Mr. Mehta. Trust me."`,
+   275→        `But Arjun Mehta had never been good at trusting people who told him not to ask questions. It was both his greatest asset and his most dangerous flaw as a journalist. Within an hour of leaving Pushpa's tea shop, he was climbing the winding path toward the abandoned research facility.\n\nThe fog thickened as he ascended. By the time the gate came into view — a rusted iron affair with a faded sign reading "Northern Research Institute, Authorized Personnel Only" — he could barely see ten feet ahead. He took photographs anyway, the flash illuminating slices of fog like surgical cuts.\n\nThe main building was in better condition than expected. The roof was intact, the windows unbroken, and the front door — though locked — yielded to a gentle push. Inside, the air was dry and still, preserved as if in amber. Desks remained arranged in neat rows. Papers sat in stacks, yellowed but readable. A coffee mug with a faded cartoon character still sat on one desk, a dark stain ring marking where someone had last set it down thirty years ago.\n\nHe found Dr. Rao's office on the second floor. The nameplate was still on the door — "Dr. Anand Rao, Director, Atmospheric Research Division." The office was large, with filing cabinets lining three walls and a massive desk dominating the center. On the desk, a single folder lay open, its contents spilling across the surface like entrails.\n\nThe folder was marked "Project Cumulus — CLASSIFIED."\n\nArjun photographed everything, his journalist's instinct overriding his common sense. The documents described experiments in atmospheric manipulation — weather control, essentially. Dr. Rao's team had been attempting to create localized fog systems using a combination of chemical compounds and electromagnetic fields. The results, according to the notes, had been "unexpectedly successful — perhaps too successful."\n\nThe last entry in Dr. Rao's log, dated November 15, 1994, read: "The fog has become autonomous. It no longer responds to our controls. It is behaving in ways we did not program — gathering, dispersing, and most alarmingly, appearing to respond to sound and movement. I believe we have created something we do not understand. I have recommended immediate cessation of the project, but the committee has declined. They want to see how far it will go. I am afraid."\n\nArjun stared at the words, feeling a chill that had nothing to do with the temperature. Outside, the fog pressed against the windows, thick and patient.\n\nHe heard footsteps in the corridor. Slow, deliberate footsteps that stopped outside the door.\n\n"Mr. Mehta," said a voice he recognized. It was Pushpa, but her tone was different — harder, more formal. "I believe I asked you not to come here."\n\n"How did you—" Arjun began.\n\n"Everyone in Silent Valley knows when someone goes to the facility," she said, stepping into the doorway. She was older than he had first thought, with lines on her face that spoke of decades of worry. "We always know. We have to. Because the fog knows too, and when it knows someone is asking questions, it gets... curious."\n\nAs if in response, the fog outside surged against the window, and for a moment, Arjun could have sworn he saw a face in it — not Pushpa's, not anyone he recognized, but a face nonetheless. Human in shape, alien in expression. Watching. Waiting.\n\n"Dr. Rao's team didn't disappear," Pushpa said quietly. "They're still here. In the fog. The experiment worked too well. The fog became a living thing, and it absorbed them — their consciousness, their memories, their awareness. They're the shapes you sometimes see moving in the mist. They're the whispers you hear at night."\n\nArjun felt the floor shift beneath him, or perhaps it was just his perception of reality beginning to crack. "That's not possible," he said, but even as he said it, he knew it was the wrong thing to say. In a place called Silent Valley, where fog had a mind of its own and birds stopped singing at dusk, impossibility was a local custom.`,
+   276→      ],
+   277→    };
+   278→
+   279→    const defaultChapters: string[] = [
+   280→      `The story of "${novel.title}" begins in a place that exists between memory and imagination — a landscape where the ordinary rules of reality have begun to soften at the edges, like ice under spring sunlight. Every great journey starts with a single uncertain step, and this one is no different.\n\nThe protagonist of our tale is someone you might recognize — not because you have met them before, but because they carry within them the same doubts and hopes that live in all of us. They are imperfect, which is to say they are human, and it is this imperfection that makes their story worth telling.\n\nIn the opening passages of this chapter, the world establishes itself with careful precision. The author, ${novel.author}, builds the setting not through exposition but through sensation — the smell of rain on stone, the sound of distant bells, the particular quality of light that exists only in certain places at certain times. These details accumulate like sediment, layer upon layer, until a world emerges that feels as real as the one outside your window.\n\nThe central conflict reveals itself gradually, like a photograph developing in a darkroom. At first, the shape is indistinct — a vague unease, a question without an answer, a path that splits in contradictory directions. But as the chapter progresses, the outlines sharpen. What seemed like coincidence begins to look like design. What felt like chance reveals the fingerprints of intention.\n\nThere is a moment — and every good story has one — when the protagonist realizes that the world they thought they knew is larger, stranger, and more dangerous than they had imagined. This moment arrives like a key turning in a lock, and suddenly doors that were walls become passageways. The familiar transforms into the extraordinary, and there is no going back to the way things were.\n\nThe chapter closes with an image that lingers — a horizon line, a closing door, a figure seen from a distance. It is an invitation to continue reading, a promise that what comes next will be worth the journey. And it is, for this is not merely a story about events but about transformation — the kind that happens within, the kind that changes a person from who they were to who they might become.\n\nTurn the page, and the journey continues. The next chapter awaits, carrying with it new revelations, deeper mysteries, and the inexorable pull of a narrative that knows where it is going even when you do not.`,
+   281→      `The second chapter of "${novel.title}" deepens the waters that the first chapter had only begun to stir. Where before we were observers, standing at the shoreline of the story, we are now wading into the current, feeling it pull at our ankles and whisper of depths we cannot yet see.\n\nOur protagonist faces their first true test, and it is not the kind that comes with swords or dramatic confrontations. It is the quieter kind — the test of conviction, of staying the course when the map no longer matches the territory. Every story worth reading contains this moment: the point where the easy path and the right path diverge, and the character must choose.\n\n${novel.author} writes with a precision that borders on the surgical, cutting away unnecessary detail to reveal the emotional architecture beneath. Dialogue crackles with subtext — characters say one thing and mean another, and the spaces between their words are as filled with meaning as the words themselves. It is the kind of writing that rewards close attention, the kind that reveals new layers upon rereading.\n\nThe world of the story expands in this chapter, revealing new corners and new characters who carry their own histories and their own wounds. We meet allies who may become enemies and strangers who may become friends. The boundary between protagonist and antagonist begins to blur, and the reader is forced to question easy assumptions about who is right and who is wrong.\n\nThere is a scene — and I will not spoil it here — that takes place in a setting of unexpected beauty. It is a moment of grace within the larger narrative, a breath before the plunge, and it demonstrates ${novel.author}'s ability to find poetry in the most unlikely places. It is the kind of scene that stays with you long after you have closed the book, surfacing in memory at odd moments, reminding you of why you read in the first place.\n\nThe chapter ends not with a cliffhanger but with a question — a question that the protagonist must answer, and by extension, a question that the reader must ponder. It is this quality that elevates "${novel.title}" from entertainment to art. It does not merely tell a story; it invites you to think, to feel, and to imagine what you would do if you were standing in the protagonist's shoes.\n\nThe fog is thickening, the plot is tightening, and the stakes are rising. Chapter three waits on the other side of the page, ready to pull you deeper into a story that shows no signs of releasing its grip.`,
+   282→      `If the first two chapters were about establishing the world and introducing the conflict, this third chapter of "${novel.title}" is about acceleration. The pace quickens, the complications multiply, and the protagonist discovers that knowledge, once gained, comes with a heavy price.\n\nThe narrative shifts into a more urgent register here. Sentences grow shorter. Paragraphs tighten. The descriptive passages that characterized the earlier chapters give way to action and dialogue — crisp, charged exchanges that propel the story forward with the inevitability of a boulder rolling downhill. ${novel.author} controls this escalation masterfully, like a conductor bringing an orchestra to crescendo.\n\nAt the heart of this chapter lies a revelation that reframes everything that has come before. Details that seemed insignificant on first reading suddenly take on new meaning. A throwaway line from chapter one becomes a crucial piece of evidence. A character's offhand gesture reveals a hidden agenda. It is the kind of structural payoff that rewards attentive reading and makes you want to immediately go back and start from the beginning.\n\nThe protagonist's internal journey mirrors the external one. As the plot complicates, so does their understanding of themselves and their place in the world. They discover reserves of strength they did not know they possessed and confront weaknesses they had spent a lifetime avoiding. It is a painful process, rendered with honesty and compassion, and it makes the character feel real in a way that transcends fiction.\n\nThere are moments of genuine tension here — scenes where the outcome is uncertain, where the reader holds their breath and turns pages with trembling fingers. But there are also moments of unexpected humor, brief flashes of lightness that make the darkness feel earned rather than oppressive. ${novel.author} understands that a story without contrast is a story without dimension.\n\nThe world continues to surprise, revealing layers of complexity that suggest a deeply imagined setting. Every location feels lived-in, every culture feels authentic, and every detail serves the larger narrative. It is world-building of the highest order — invisible in its construction but impossible to ignore in its effect.\n\nBy the chapter's end, the protagonist has passed a point of no return. The old world is behind them, and the new one — larger, stranger, more dangerous — stretches ahead like an unexplored continent. There is fear in this passage, but there is also exhilaration, the particular thrill of stepping into the unknown with nothing but your wits and your courage to guide you.\n\nTwo chapters remain. The story has built its foundations, raised its walls, and now the roof is going on. The structure is nearly complete, and when it is finished, it will be a thing of beauty — complex, enduring, and impossible to look away from.`,
+   283→      `In the penultimate chapter of "${novel.title}", ${novel.author} pulls together the threads that have been woven throughout the narrative, creating a tapestry of breathtaking complexity and emotional depth. This is the chapter where everything converges — plot lines, character arcs, thematic elements — into a single, powerful moment of synthesis.\n\nThe protagonist stands at the center of a web they have been unwittingly spinning since the first page. Every choice, every encounter, every seemingly random event has led to this moment, and the realization is both humbling and empowering. They are not a pawn of fate but an active participant in a story they helped create.\n\nThe writing in this chapter reaches its peak. ${novel.author} employs a variety of techniques — shifting perspectives, temporal jumps, stream-of-consciousness passages — to create a reading experience that is as intellectually stimulating as it is emotionally resonant. The prose sings, and every sentence carries the weight of everything that has come before.\n\nThere is a confrontation here that has been building since the beginning. It is not a violent confrontation — or rather, its violence is psychological rather than physical. Words become weapons, truths become wounds, and the space between two characters becomes a battlefield of ideology and emotion. It is masterful writing, the kind that makes you put the book down and stare at the wall for a while, trying to process what you have just experienced.\n\nBut this chapter is not all darkness. In fact, some of the most beautiful passages in the entire novel appear here, in the aftermath of conflict, when the dust settles and the characters must find a way to live with what has been revealed. There is forgiveness in these passages, and grace, and a hard-won understanding that the world is more complicated than any single perspective can encompass.\n\nThe supporting characters, who have been developed with care and consistency throughout, get their moments of resolution here. Their arcs close with the same attention to detail that characterized their opening, creating a sense of completeness that is deeply satisfying. No thread is left dangling, no question goes unanswered — at least, not the questions that can be answered.\n\nAs the chapter draws to a close, the final chapter beckons like a door at the end of a long corridor. The protagonist has one last journey to make, one last truth to discover, and the reader is invited along for the ride. It has been an extraordinary trip so far — harrowing, exhilarating, thought-provoking — and the promise of its conclusion is both thrilling and bittersweet.\n\nOne chapter remains. The story is almost complete. But as any great storyteller knows, endings are not conclusions — they are transformations.`,
+   284→      `The final chapter of "${novel.title}" is a meditation on endings and beginnings, on the ways in which stories end but lives continue. ${novel.author} has saved the best for last, delivering a conclusion that is at once surprising and inevitable, satisfying and thought-provoking.\n\nThe protagonist's final journey takes them to a place that is both familiar and transformed — a return to origins that is also a departure into something entirely new. The setting, described with the vivid specificity that has characterized the entire novel, becomes a mirror for the character's internal state. Landscape and emotion merge, creating passages of prose that are almost hallucinatory in their intensity.\n\nThe central conflict reaches its resolution, but it is not the kind of resolution that ties everything up with a neat bow. It is messier than that, more realistic, more true. Some questions are answered definitively. Others remain open, inviting the reader to bring their own interpretation to the text. It is a respectful approach to the reader's intelligence, and it makes the story feel larger than its own pages.\n\n${novel.author}'s prose achieves a new level of beauty in these final passages. There is a luminosity to the writing, a sense that the author has found exactly the right words for exactly the right moments, that makes the conclusion feel earned rather than forced. Every image is precise, every metaphor resonates, and every sentence carries the accumulated weight of the entire narrative.\n\nThe ending — and I will be deliberately vague here, because this is a book that deserves to be experienced fresh — is simultaneously an ending and an opening. It closes the story while suggesting that the characters' lives continue beyond the final page. It provides closure while maintaining a sense of wonder. It is, in short, exactly what a great novel's ending should be.\n\n"${novel.title}" is a remarkable achievement. It is a novel that entertains, challenges, and ultimately transforms its reader. ${novel.author} has created a world that feels as real as our own and characters who feel as complex as people we know. The writing is superb throughout, reaching moments of genuine transcendence in its final chapters.\n\nAs you close the book and return to the world outside, you carry something with you — a new perspective, a new question, a new appreciation for the power of storytelling. And perhaps, when you look up at the sky, or hear a sound you cannot identify, or feel a shift in the wind that carries no explanation, you will think of this story and wonder — just for a moment — if the boundary between fiction and reality is as solid as we believe it to be.\n\nThank you for reading.`,
+   285→    ];
+   286→
+   287→    // Use specific content if available, otherwise use default
+   288→    if (contents[novel.title] && contents[novel.title][chapterNum - 1]) {
+   289→      return contents[novel.title][chapterNum - 1];
+   290→    }
+   291→
+   292→    // Generate unique chapter intros for novels without specific content
+   293→    const chapterIntros = [
+   294→      `The story of "${novel.title}" opens with a scene of quiet intensity — a moment so precisely rendered that it feels more remembered than invented. ${novel.author} establishes the emotional and physical landscape of the narrative with the confidence of a writer who knows exactly where this story is going, even if the characters do not.\n\nThe protagonist arrives — not with fanfare but with the quiet inevitability of a tide. They carry with them a past that the author reveals in fragments, like pieces of a mosaic gradually forming a picture. Each fragment reframes the others, creating a portrait of a life that is more complex than any single memory can capture.\n\nThe world of the story breathes with authenticity. ${novel.author} has an eye for the telling detail — the way light falls through a particular window at a particular hour, the sound of a language spoken with a particular accent, the weight of an object worn smooth by years of use. These details accumulate, creating a sense of place that is almost palpable.\n\nThe narrative voice is confident and controlled, capable of lyrical beauty one moment and brutal honesty the next. It is the voice of someone who has thought deeply about the story they are telling and trusts both the material and the reader to find their way through it.\n\nConflict, when it arrives, does so naturally — emerging from the intersection of character and circumstance rather than being imposed from without. It is the kind of conflict that feels inevitable in retrospect, the collision of forces that were always heading toward each other, propelled by the gravity of who these people are and what they want.\n\nThis first chapter sets the stage with masterful precision, introducing themes, characters, and tensions that will resonate throughout the entire narrative. It is an invitation — a hand extended across the page, inviting you into a world that is rich, strange, and utterly compelling.\n\n${defaultChapters[0]}`,
+   295→      `The second chapter of "${novel.title}" descends deeper into the narrative's emotional core. The surface calm of the opening gives way to turbulence — not chaotic, but controlled, like a river entering rapids. ${novel.author} navigates this transition with the skill of a writer who understands that pacing is not about speed but about rhythm.\n\nRelationships that seemed straightforward in the first chapter reveal hidden depths. A casual conversation between two characters carries the weight of years of unspoken feeling. A minor character who seemed like mere decoration turns out to hold a key that unlocks a crucial piece of the puzzle. Nothing in this story is wasted; everything serves a purpose, even if that purpose is not immediately apparent.\n\nThe protagonist's internal journey takes center stage here. We see them struggling with decisions that have no easy answers, caught between competing desires and obligations. ${novel.author} renders this struggle with empathy and precision, avoiding both sentimentality and coldness. The result is a character who feels real — flawed, conflicted, and deeply human.\n\nThere is a shift in the narrative's tone midway through this chapter, a darkening that signals the arrival of genuine danger. What was mysterious becomes threatening, what was uncertain becomes urgent. The stakes rise, and with them, the reader's investment in the outcome.\n\n${novel.author} deploys a powerful image at the chapter's climax — a visual metaphor that crystallizes the theme of the entire novel in a single, unforgettable moment. It is the kind of writing that makes you gasp, not because of its cleverness, but because of its emotional truth.\n\nThe chapter closes with a moment of stillness — a breath before the storm that the reader can feel building on the horizon. It is a masterful structural choice, creating anticipation without anxiety, tension without anxiety.\n\n${defaultChapters[1]}`,
+   296→      `Chapter three of "${novel.title}" marks a turning point — the moment when the narrative shifts from building to accelerating. ${novel.author} increases the pace without sacrificing depth, creating a chapter that reads with the urgency of a thriller while maintaining the literary complexity that has characterized the work so far.\n\nThe protagonist makes a choice in this chapter that will define the rest of the story. It is not a dramatic, cinematic choice — there is no swelling music, no slow-motion walk toward destiny. It is a quiet, personal choice, made in a moment of vulnerability, and its consequences ripple outward like waves from a stone dropped in still water.\n\nThe writing here is at its most cinematic. ${novel.author} has an uncanny ability to place the reader inside a scene, making you feel the air temperature, hear the ambient sounds, sense the spatial relationships between characters. You are not reading about these events; you are experiencing them, and the distinction matters.\n\nA secondary character delivers a monologue in this chapter that is, in itself, worth the price of admission. It is a speech that manages to be both universal and deeply specific, philosophical and personal, and it reframes everything that has come before in a new and revealing light.\n\nThe world of the story expands significantly in this chapter, revealing new dimensions that add both breadth and depth to the narrative. ${novel.author} has been planning this expansion since the first page, and the groundwork laid in earlier chapters pays off beautifully.\n\n${defaultChapters[2]}`,
+   297→      `In the penultimate chapter of "${novel.title}," ${novel.author} brings the narrative to a point of maximum tension before the final resolution. All the threads that have been woven throughout the story — thematic, emotional, narrative — converge in a sequence of scenes that is as technically accomplished as it is emotionally devastating.\n\nThe protagonist faces a crisis that strips away every pretense and protection they have built around themselves. In this naked moment, we see them as they truly are — not the version they present to the world, but the raw, unfiltered person beneath. It is a brave piece of writing, requiring both honesty from the author and vulnerability from the character.\n\nThe antagonistic force — whether external or internal — reaches its peak of power here, creating a conflict that seems, for a moment, insurmountable. The reader feels the weight of the odds, the impossibility of the situation, and in feeling this, appreciates all the more the courage required to face it.\n\n${novel.author} employs a narrative technique in this chapter that is both surprising and effective — a structural choice that I will not spoil, but that fundamentally changes the way the story is experienced. It is a bold move, one that could have backfired in less capable hands, but here it works brilliantly.\n\n${defaultChapters[3]}`,
+   298→      `The final chapter of "${novel.title}" delivers on every promise made by its predecessors. ${novel.author} has been building toward this moment since the first page, and the conclusion feels both surprising and inevitable — the mark of a story that has been told with complete artistic control.\n\nThe resolution is not simple. ${novel.author} respects the complexity of the narrative too much to offer easy answers. Some questions are answered, some are left open, and the story is richer for this ambiguity. It trusts the reader to engage with the text on their own terms, to bring their own interpretation to the material.\n\nThe final scene is a masterpiece of understatement — quiet, almost mundane in its surface details, but carrying an emotional charge that is almost overwhelming in its intensity. It is the kind of ending that lingers in the mind long after the book is closed, surfacing in quiet moments to remind you of its power.\n\n"${novel.title}" is, without question, one of the most accomplished works of fiction in recent years. ${novel.author} has created a world that is at once fantastical and deeply real, populated with characters who breathe and bleed and hope and despair. The writing is exquisite, the storytelling is masterful, and the emotional impact is profound.\n\n${defaultChapters[4]}`,
+   299→    ];
+   300→
+   301→    return chapterIntros[chapterNum - 1] || defaultChapters[0];
+   302→  }
+   303→
+   304→  if (isHi) {
+   305→    const hiContents: string[] = [
+   306→      `कहानी की शुरुआत एक अनजान जगह से होती है — एक ऐसा मकान जो सौ साल पुराना है, जिसकी दीवारों पर ज़माने के दाग लगे हैं। हर ईंट में एक कहानी छुपी है, हर खिड़की से एक नया नज़ारा दिखता है। ${novel.author} ने इस कहानी को ऐसी महारत से लिखा है कि हर पन्ना पर आप खुद को उस जगह पाते हैं जहाँ कहानी घट रही है।\n\nनायक का परिचय एक ऐसे दृश्य से होता है जो आपको ठंडक से कंपा दे, फिर गर्माहट से सहला दे। वह एक आम इंसान है — ऐसा इंसान जिसे आप शायद अपने आसपास भी देख चुके हों। उसके सपने बड़े हैं, उसकी परेशानियाँ भी। उसकी ज़िंदगी वैसी ही उलझी हुई है जैसी हमारी हमारी।\n\n${novel.author} की भाषा सरल है, पर गहरी। वह आसान शब्दों में ऐसी बातें कह जाते हैं कि आपको बार-बार उन पंक्तियों पर रुकना पड़ता है। हर वाक्य में एक अर्थ छुपा है, हर वाक्य के पीछे एक सवाल। और जब आप आगे बढ़ते हैं, तो वो सवालों के जवाब मिलते भी हैं और नये सवाल भी पैदा होते हैं।\n\nकहानी में जो टकराव आता है, वो अचानक नहीं आता। उसकी जड़ें पहले ही बोई जा चुकी हैं — एक-एक करके, धीरे-धीरे। जैसे बादल एक नहीं आते, एक जुट जाते हैं और फिर बरस पड़ते हैं। यह कहानी भी ऐसे ही बरसती है — हर अध्याय में एक नई बौछार, हर पन्ने पर एक नया रंग।\n\nपहला अध्याय बस एक शुरुआत है — एक दरवाज़ा खुलता है और आपको अंदर बुलाता है। अंदर क्या है? कहानी लेती है आपको वहाँ। बस पन्ने पलटिए, कहानी आगे बढ़ेगी।`,
+   307→      `दूसरे अध्याय में कहानी गहराई में जाती है — जैसे नदी जब तेज़ होती है तो गहरे तक उतरती है। ${novel.author} ने इस अध्याय को ऐसी संरचना दी है कि हर पैराग्राफ में एक नया मोड़ आता है। जहाँ आपको लगता है कि अब रास्ता साफ़ है, वहीं एक नई दीवार खड़ी हो जाती है।\n\nनायक का संघर्ष इस अध्याय में और तीखा हो जाता है। उसका सामना ऐसी परिस्थितियों से होता है जो उसकी हिम्मत की परीक्षा लेती हैं। ${novel.author} ने इस संघर्ष को इतनी सच्चाई से लिखा है कि आप महसूस करते हैं कि यह कोई कहानी नहीं, किसी की असली ज़िंदगी है।\n\nइस अध्याय में कई नए पात्र आते हैं — कुछ दोस्त बनते हैं, कुछ दुश्मन। लेकिन ${novel.author} ने इन पात्रों को इतनी जीवंतता से चित्रित किया है कि उनका हर संवाद, हर हाव-भाव, एक कहानी बयाँ करता है। कुछ तो ऐसे हैं जिन्हें आप पढ़ते-पढ़ते पसंद करने लगेंगे, और कुछ ऐसे जिनसे नफ़रत हो जाएगी — लेकिन उन सबको याद रखेंगे।\n\nवातावरण का वर्णन इस अध्याय में और भी सटीक है। ${novel.author} ने मौसम, रंग, आवाज़, सब कुछ इस तरह लिखा है कि आप खुद को उस जगह खड़ा पाते हैं। बारिश की बूँदें, पत्तों की आवाज़, हवा की ठंडक — सब कुछ आपकी कल्पना में साकार हो जाता है।\n\nअध्याय का अंत एक ऐसे मोड़ पर होता है जो आपको अगले अध्याय के लिए बेताब कर देता है। ${novel.author} ने यह मोड़ इतनी सफाई से तैयार किया है कि आप अगले पन्ने को छोड़ नहीं पाएंगे।`,
+   308→      `तीसरे अध्याय में कहानी की गति तेज़ हो जाती है। ${novel.author} ने इस अध्याय को ऐसी ऊर्जा दी है कि पढ़ते हुए आपका दिल तेज़ धड़कने लगता है। हर घटना एक झटका है, हर संवाद एक प्रश्न है, और हर जवाब दस नए सवाल लाता है।\n\nनायक को एक ऐसा फैसला करना पड़ता है जो उसकी पूरी ज़िंदगी बदल देगा। यह फैसला आसान नहीं है — कोई फैसला कभी आसान नहीं होता जब सब कुछ दाँव पर हो। ${novel.author} ने इस फैसले के पहले और बाद के दृश्यों को इतनी सूक्ष्मता से लिखा है कि आप नायक के भावनात्मक संघर्ष को साफ़ महसूस करते हैं।\n\nइस अध्याय में एक ऐसा दृश्य है जो आपको चौंका देगा — एक ऐसा मोड़ जिसे आपने नहीं सोचा होगा। ${novel.author} ने इस मोड़ को बहुत पहले से तैयार किया था, और जब वो आता है, तो आपको अचानक याद आता है कि पहले अध्यायों में इसके संकेत मिल रहे थे। यही तो सच्ची कथा कला है — जब आप पहले से योजना बनाए हुए हैं, लेकिन पाठक को लगता है कि सब अचानक हो रहा है।\n\nदोस्ती, धोखा, प्यार, नफ़रत — इस अध्याय में हर भावना अपने चरम पर है। ${novel.author} ने इन भावनाओं को कभी अतिशयोक्ति से नहीं लिखा — हर भावना उसी अनुपात में है जिसमें असली ज़िंदगी में होती है। यही इस कहानी की सबसे बड़ी ताकत है।\n\nअध्याय के अंत में एक ऐसा मौका है जो आपको रुला भी सकता है और हँसा भी। यह ${novel.author} की लेखनी का कमाल है — वह एक ही दृश्य में कई भावनाएँ समेट लेते हैं, और हर भावना अपनी पूरी ताकत के साथ महसूस होती है।`,
+   309→      `अंतिम अध्याय में ${novel.author} सारे कथानक को एक साथ जोड़ते हैं — जैसे एक कलाकार अपनी पेंटिंग का आखिरी छोरा लगाता है और पूरी तस्वीर साफ़ हो जाती है। हर सवाल का जवाब मिलता है, हर रहस्य सुलझता है, और हर पात्र अपनी सच्ची जगह पर पहुँचता है।\n\n${novel.author} ने इस कहानी को एक ऐसे अंत तक पहुँचाया है जो न तो बहुत खुश करता है और न बहुत उदास। यह वो अंत है जो असली ज़िंदगी में होता है — अधूरा लेकिन संतोषजनक, खुला लेकिन सार्थक। आपको लगता है कि कहानी खत्म हो गई, लेकिन उसके पात्र आपके दिमाग में ज़िंदा रहेंगे।\n\nयह कहानी केवल मनोरंजन नहीं है। यह एक अनुभव है। ${novel.author} ने शब्दों को ऐसे सजाया है कि हर पन्ना एक कलाकृति बन जाता है। भाषा ऐसी है कि कभी आपको रुला दे, कभी हँसा दे, कभी सोचने पर मजबूर कर दे।\n\n"${novel.title}" एक ऐसी कहानी है जो आपके साथ रहेगी — पढ़ने के बाद भी। दिन बीतेंगे, हफ्ते गुज़रेंगे, लेकिन इस कहानी के कुछ दृश्य आपके ज़हन में बसे रहेंगे। कुछ किरदार ऐसे हैं जिन्हें आप भूल नहीं पाएंगे। यही ${novel.author} की लेखनी की सच्ची ताकत है।\n\nकहानी खत्म होती है, लेकिन उसका असर बना रहता है। शायद यही असली साहित्य है — जो खत्म होने के बाद भी ज़िंदा रहता है।`,
+   310→    ];
+   311→    return hiContents[Math.min(chapterNum - 1, hiContents.length - 1)];
+   312→  }
+   313→
+   314→  if (isNe) {
+   315→    const neContents: string[] = [
+   316→      `कथाको सुरुवात एउटा अनौठो ठाउँबाट हुन्छ — एउटा त्यो ठाउँ जहाँ समय अलि फरक तरिकाले बग्छ। ${novel.author}ले यो कथा लेख्दा एउटा अनि विशेष कुरा ध्यानमा राखेका छन् — पाठकलाई कथाको संसारमा पस्काउनु। र उनले यो काम इति राम्रो गरेका छन् कि पहिलो पन्ना पढ्ने बित्तिकै तपाईं आफैँलाई त्यही संसारमा पाउनुहुन्छ।\n\nनायकको परिचय एउटा साधारण दृश्यबाट हुन्छ — तर त्यो साधारण दृश्यमा असाधारण कुरा लुकेको हुन्छ। ${novel.author}को शैली यस्तो छ कि उनले साना-साना विवरणहरूबाट ठूलो तस्बिर बनाउँछन्। एउटा ढोकाको आवाज, एउटा पातको रंग, एउटा चियाको सुगन्ध — यी सबै मिलेर एउटा संसार बनाउँछन् जसमा तपाईं डुब्न सक्नुहुन्छ।\n\nकथामा जुन द्वन्द्व आउँछ, त्यो अचानक आउँदैन। त्यसको बीउ पहिलै बोइसकेको हुन्छ — एक-एक गरेर, धीरे-धीरे। ${novel.author}ले यो काम एउटा बाह्री कारीगरको जस्तो गरेका छन् — हर स्ट्रोक सही ठाउँमा, हर रंग सही मात्रामा। र परिणाम छ — एउटा कथा जसले तपाईंलाई पहिलो पन्नादेखि अन्तिम पन्नासम्म बाँधेर राख्छ।\n\nयो पहिलो अध्याय केवल सुरुवात हो — एउटा ढोका खुल्छ र भित्रबाट कोही बोलाउँछ। तपाईं भित्र जानुहोस्, कथा पर्खिरहेको छ।\n\n${novel.author}को भाषा सरल छ तर गहिरो। उनले असली जीवनका अनुभवहरूलाई शब्दहरूमा ढाल्ने क्षमता राख्छन्। उनका वाक्यहरू पढ्दा तपाईंलाई लाग्छ कि ती वाक्य कुनै पात्रले भनेका होउन् — ती वाक्यमा जीवन छ, निश्वास छ। यही नै राम्रो साहित्यको परिचायक हो।`,
+   317→      `दोस्रो अध्यायमा कथा गहिराइमा जान्छ। ${novel.author}ले पहिलो अध्यायमा जुन दृश्यहरू रचेका थिए, यो अध्यायमा ती दृश्यहरूलाई नयाँ अर्थ दिन्छन्। ती वस्तुहरू, ती संवादहरू, ती चेहराहरू — सबैले अब नयाँ कथा भन्न थाल्छन्।\n\nनायकको यात्रा यो अध्यायमा झन् कठिन हुन्छ। उसको सामना अनपेक्षित चुनौतीहरूसँग हुन्छ — ती चुनौतीहरू न तो शारीरिक हुन् न तो बाह्य। ती मानसिक हुन् — भित्रबाट आउने, गहिराइबाट आउने। ${novel.author}ले यो मानसिक संघर्षलाई इति सच्चाईसँग चित्रण गरेका छन् कि पाठकले स्वयं आफैले त्यो दुःख अनुभव गर्छ।\n\nयो अध्यायमा नयाँ पात्रहरू आउँछन् — केही उसको मद्दतका लागि, केही उसको बाटोमा बाधा बन्न। ${novel.author}ले प्रत्येक पात्रलाई आफ्नै व्यक्तित्व दिएका छन् — कुनै पात्र उही छ जुन उसले छोडेको थियो, कुनै पात्र अर्को रूप लिएर फर्किन्छ। हर पात्रको एउटा कथा छ — ${novel.author}ले ती कथाहरू कुरा गर्दैनन्, तर ती पात्रका हरेक काम र भाषाबाट ती कथाहरू झल्कन्छन्।\n\nवातावरणको वर्णन यो अध्यायमा अझ समृद्ध छ। ${novel.author}ले हिमालको ठाडो चुचुरो, बाटोमा चलेका यात्रीको थकान, गाउँको शान्तता — सबैलाई शब्दहरूमा ढाल्छन्। पढ्दा तपाईंले हिमालको चिसो हावा महसूस गर्नुहुन्छ, गाउँको मिठो चियाको सुगन्ध पाउनुहुन्छ।\n\nअध्यायको अन्त्य एउटा अनौठो मोडमा हुन्छ — एउटा यो मोड जुन तपाईंले आगामी अध्यायको लागि बेचैन बनाउँछ। ${novel.author}ले यो मोडलाई धेरै पहिल्यै तयारी गरेका थिए, र जब त्यो आउँछ, तपाईंले आफैँलाई तयार पाउनुहुन्छ।`,
+   318→      `तेस्रो अध्यायमा कथाको गति तेज हुन्छ। ${novel.author}ले यो अध्यायलाई एउटा विशेष ऊर्जा दिएका छन् — पढ्ने मानिसको हृदय गति बढ्छ, सास छिटो-छिटो आउँछ।\n\nनायकले यो अध्यायमा एउटा ठूलो निर्णय गर्नुपर्छ। यो निर्णय सजिलो छैन — कुनै पनि ठूलो निर्णय सजिलो हुँदैन। ${novel.author}ले यो निर्णयका पहिले र पछिका दृश्यहरूलाई यति सूक्ष्मतासँग लेखेका छन् कि पाठक नायकको भावनात्मक अवस्था स्पष्ट देख्न सक्छ।\n\nयो अध्यायमा एउटा दृश्य छ जुन तपाईंलाई चकित पार्छ — एउटा मोड जुन कसैले पनि अनुमान गर्न सक्दैन। ${novel.author}ले यो मोड धेरै पहिल्यै तयार गरेका थिए — पहिला र दोस्रो अध्यायमा यसका संकेतहरू दिइएका थिए, तर ती संकेतहरू त्यति साना थिए कि कसैले ध्यान दिएन। अब, तेस्रो अध्यायमा, ती संकेतहरू एकत्रित हुन्छन् र एउटा ठूलो चित्र बन्छन्।\n\nयो अध्यायमा प्रेम, घृणा, विश्वास, र धोका — सबै भावनाहरू आफ्नो चरममा पुग्छन्। ${novel.author}ले कुनै पनि भावनालाई अतिशयोक्तिमा नलेखेका छन् — हर भावना उत्तिकै मात्रामा छ, जसरी असली जीवनमा हुन्छ। यही यो कथाको सबैभन्दा ठूलो शक्ति हो।\n\nअध्यायको अन्त्यमा एउटा दृश्य छ जुन तपाईंलाई रुन दिन सक्छ र हाँसाउन पनि सक्छ। ${novel.author}को लेखन शैलीको यही कमाल हो — एउटै दृश्यमा धेरै भावनाहरू समाहित गर्न सक्नु।`,
+   319→      `अन्तिम अध्यायमा ${novel.author} सम्पूर्ण कथालाई एकै ठाउँमा ल्याउँछन् — सबै धागाहरू एकसाथ जोडिन्छन्। यो दृश्य एउटा चित्रकारले आफ्नो पेन्टिङको अन्तिम चोट दिएजस्तो हो — एकैछाकमा पूरो तस्बिर स्पष्ट हुन्छ।\n\n${novel.author}ले यो कथालाई एउटा अन्त्यतिर लैजानुभएको छ जुन न त अति खुशी हुन्छ न त अति दुःखी। यो अन्त्य असली जीवनजस्तो छ — अधूरो तर सन्तोषजनक, खुला तर अर्थपूर्ण। पाठकले महसूस गर्छ कि कथा सकियो, तर यसका पात्रहरू अझै जीवित छन् — उनीहरू तपाईंको मनमा बाँचिरहनेछन्।\n\nयो कथा केवल कथा होइन — यो एउटा अनुभव हो। ${novel.author}ले शब्दहरूलाई एउटा कलाकृतिमा परिणत गरेका छन्। भाषा यति सुन्दर छ कि केही पंक्तिहरू तपाईंले मुखस्थ गर्न सक्नुहुन्छ — र जब तपाईंलाई याद आउँछ, तब तपाईंको मुस्कान आफैँ आउँछ।\n\n"${novel.title}" एउटा यस्तो कथा हो जुन तपाईंसँग सधैं रहनेछ — पढिसकेपछि पनि। दिन बित्छन्, हप्ता गुज्रन्छन्, तर यो कथाका केही दृश्यहरू तपाईंको स्मृतिमा बसिरहनेछन्। केही पात्रहरू यस्ता छन् जुन तपाईंले सधैं याद राख्नुहुनेछ। यही ${novel.author}को लेखनको सच्चो शक्ति हो।\n\nकथा सकिन्छ, तर यसको प्रभाव बाँचिरहन्छ। शायद यही नै खरो साहित्य हो — जुन सकिएपछि पनि जीवित रहन्छ।`,
+   320→    ];
+   321→    return neContents[Math.min(chapterNum - 1, neContents.length - 1)];
+   322→  }
+   323→
+   324→  return `Chapter ${chapterNum} of "${novel.title}" by ${novel.author}. Content continues...`;
+   325→}
+   326→
+   327→function generateRoleplayScenes(storyId: string, language: string): Array<{
+   328→  storyId: string;
+   329→  title: string;
+   330→  narrative: string;
+   331→  imageUrl: string;
+   332→  choices: string;
+   333→  isStart: boolean;
+   334→}> {
+   335→  if (language === 'en') {
+   336→    if (storyId.endsWith('0') || storyId.endsWith('1') || storyId.endsWith('2') || storyId.endsWith('3') || storyId.endsWith('4') || storyId.endsWith('5') || storyId.endsWith('6') || storyId.endsWith('7') || storyId.endsWith('8') || storyId.endsWith('9') || storyId.endsWith('a') || storyId.endsWith('b') || storyId.endsWith('c') || storyId.endsWith('d') || storyId.endsWith('e') || storyId.endsWith('f')) {
+   337→      // The Cursed Temple
+   338→      return [
+   339→        {
+   340→          storyId,
+   341→          title: 'The Gateway',
+   342→          narrative: 'You stand before a massive stone doorway carved into the mountainside. Ancient symbols glow faintly on the stone frame, pulsing with an inner light that seems to respond to your presence. The air is cold and smells of earth and something else — something metallic, like the scent of a copper coin pressed to your tongue. Behind you, the path you climbed winds back into the mist. Ahead, the temple entrance beckons. You notice two distinct paths leading deeper: one lit by flickering torches on the left, and one shrouded in complete darkness on the right. At your feet, a weathered journal lies open to a final entry: "The temple remembers. Choose carefully — the walls have eyes." The wind howls through the doorway, carrying whispers in a language you cannot understand.',
+   343→          imageUrl: '',
+   344→          choices: JSON.stringify([
+   345→            { text: 'Enter through the torchlit path (left)', nextScene: 1 },
+   346→            { text: 'Step into the darkness (right)', nextScene: 2 },
+   347→            { text: 'Read the journal more carefully', nextScene: 3 },
+   348→          ]),
+   349→          isStart: true,
+   350→        },
+   351→        {
+   352→          storyId,
+   353→          title: 'The Hall of Echoes',
+   354→          narrative: 'The torchlit corridor stretches before you, the flames casting dancing shadows on walls covered in intricate carvings. The figures in the carvings seem to move when you are not looking directly at them — warriors, priests, and something else, something with too many limbs. As you walk deeper, your footsteps echo strangely, returning to your ears a fraction of a second late, as if someone is following you. The corridor opens into a vast hall filled with stone pillars, and between each pillar hangs a bronze bell. A plaque on the floor reads: "Ring the truth, and the path will open. Ring the lie, and the darkness will know your name." In the center of the hall, a pedestal holds a mallet.',
+   355→          imageUrl: '',
+   356→          choices: JSON.stringify([
+   357→            { text: 'Ring the largest bell in the center', nextScene: 4 },
+   358→            { text: 'Search the pillars for hidden messages', nextScene: 5 },
+   359→            { text: 'Ignore the bells and find another exit', nextScene: 6 },
+   360→          ]),
+   361→          isStart: false,
+   362→        },
+   363→        {
+   364→          storyId,
+   365→          title: 'The Dark Descent',
+   366→          narrative: 'You step into absolute darkness. The darkness is so complete that you cannot see your own hand in front of your face. Your other senses sharpen immediately — you hear the drip of water somewhere ahead, feel the stone floor angling downward beneath your boots, and smell something ancient and organic, like the inside of a cave that has been sealed for centuries. After what feels like an hour of careful navigation by touch, your fingers find a metal railing. Following it, you discover a spiral staircase descending into the depths. A faint green glow emanates from below, pulsing like a heartbeat. As you descend, the walls begin to feel warm — not with heat, but with something alive, something that presses against your palm like skin.',
+   367→          imageUrl: '',
+   368→          choices: JSON.stringify([
+   369→            { text: 'Continue descending toward the green glow', nextScene: 7 },
+   370→            { text: 'Turn back and try the torchlit path', nextScene: 1 },
+   371→            { text: 'Call out into the darkness', nextScene: 8 },
+   372→          ]),
+   373→          isStart: false,
+   374→        },
+   375→        {
+   376→          storyId,
+   377→          title: 'The Journal\'s Secrets',
+   378→          narrative: 'You kneel and examine the journal more carefully. The handwriting is frantic, the letters compressed as if the writer was running out of time or space. The journal belongs to an archaeologist named Dr. Helena Croft, and her entries describe weeks of exploration inside the temple. She discovered that the temple was built not as a place of worship, but as a prison — a container for something the ancient builders called "The Dreamer." According to her notes, The Dreamer is a consciousness that exists between sleeping and waking, capable of entering the minds of anyone who enters the temple and turning their thoughts against them. The final entry is most disturbing: "I can feel it now, at the edge of my thoughts. It knows I am writing this. It knows I am trying to warn the next person. But warning is useless. The temple does not release what it holds. Not alive." As you read this, the journal pages begin to darken, as if ink is spreading backward from the edges.',
+   379→          imageUrl: '',
+   380→          choices: JSON.stringify([
+   381→            { text: 'Enter the torchlit path, warned and prepared', nextScene: 1 },
+   382→            { text: 'Enter the darkness, warned and prepared', nextScene: 2 },
+   383→            { text: 'Take the journal with you', nextScene: 9 },
+   384→          ]),
+   385→          isStart: false,
+   386→        },
+   387→        {
+   388→          storyId,
+   389→          title: 'The Bell\'s Voice',
+   390→          narrative: 'You lift the mallet and strike the largest bell. The sound that emerges is not a simple chime — it is a chord, layered and complex, as if multiple instruments are playing simultaneously. The sound reverberates through the hall, and as it echoes, the carvings on the pillars begin to glow. The warrior figures step out of the stone, becoming three-dimensional shadows that pace around you in a circle. They are not threatening — they are watching, evaluating. One of them, larger than the others, stops in front of you and points toward a section of the wall where the stone has crumbled, revealing a hidden passage. The shadow-figures bow simultaneously, and the bell falls silent. Beyond the hidden passage, stairs spiral upward toward a faint golden light.',
+   391→          imageUrl: '',
+   392→          choices: JSON.stringify([
+   393→            { text: 'Follow the hidden passage upward', nextScene: 10 },
+   394→            { text: 'Ask the shadow-figures a question', nextScene: 11 },
+   395→            { text: 'Explore the rest of the hall first', nextScene: 5 },
+   396→          ]),
+   397→          isStart: false,
+   398→        },
+   399→        {
+   400→          storyId,
+   401→          title: 'The Hidden Inscriptions',
+   402→          narrative: 'As you examine the pillars more closely, you discover that each one bears a different inscription in the ancient language. Using your knowledge of linguistic patterns and the symbols from the doorway, you begin to piece together a fragmented narrative. The temple was built by seven brothers who made a pact with an entity from the space between worlds. In exchange for knowledge and power, each brother agreed to surrender a different sense — sight, hearing, touch, taste, smell, balance, and time. The seven senses were woven into the temple\'s architecture, creating a structure that could perceive the world even when no one was inside. But the entity betrayed the brothers, trapping their consciousness within the stone. The pillars are their bodies. The bells are their voices. And the temple itself is their prison.',
+   403→          imageUrl: '',
+   404→          choices: JSON.stringify([
+   405→            { text: 'Free the brothers by breaking the pillars', nextScene: 12 },
+   406→            { text: 'Ring the bells in a specific order', nextScene: 4 },
+   407→            { text: 'Leave the hall and find another way', nextScene: 6 },
+   408→          ]),
+   409→          isStart: false,
+   410→        },
+   411→        {
+   412→          storyId,
+   413→          title: 'The Crystal Chamber',
+   414→          narrative: 'You find a narrow passage behind one of the pillars that leads to a small chamber filled with crystalline formations. The crystals glow with an inner light that shifts through colors — blue, green, violet — in a slow, hypnotic rhythm. In the center of the chamber stands a crystal larger than the others, shaped roughly like a human figure. As you approach, the figure\'s features sharpen — it is not carved but grown, as if the crystal had decided to become human. A voice emerges from the crystal, neither male nor female, neither old nor young: "You are the first in many years to find this place without guidance. The temple tests all who enter. Some pass. Some do not. Some become part of the temple itself." The crystal figure extends its hand, and in its palm rests a small, faceted gem that pulses with the same light as the crystals around you.',
+   415→          imageUrl: '',
+   416→          choices: JSON.stringify([
+   417→            { text: 'Take the gem', nextScene: 13 },
+   418→            { text: 'Ask the crystal figure about the temple\'s history', nextScene: 14 },
+   419→            { text: 'Refuse and leave the chamber', nextScene: 1 },
+   420→          ]),
+   421→          isStart: false,
+   422→        },
+   423→        {
+   424→          storyId,
+   425→          title: 'The Dreamer\'s Domain',
+   426→          narrative: 'At the bottom of the spiral staircase, you enter a vast underground chamber lit entirely by the pulsing green glow. The chamber is circular, with a ceiling so high that it vanishes into shadow. In the center, suspended in midair by nothing visible, is a massive eye — closed, sleeping, but unmistakably alive. It is The Dreamer that Dr. Croft wrote about. As you watch, the eye twitches behind its closed lid, and the green glow brightens momentarily. Images begin to flash in the air around you — memories that are not yours: climbing the mountain as a child, reading a book by candlelight, standing on a cliff edge with arms spread wide. The Dreamer is dreaming, and its dreams are bleeding into reality. A voice whispers in your ear, "Stay a while. I have been so lonely." The warmth on the walls increases, and you feel an overwhelming urge to sleep.',
+   427→          imageUrl: '',
+   428→          choices: JSON.stringify([
+   429→            { text: 'Resist the urge and search for a way to escape', nextScene: 15 },
+   430→            { text: 'Close your eyes and enter the Dreamer\'s dream', nextScene: 16 },
+   431→            { text: 'Try to wake the Dreamer', nextScene: 17 },
+   432→          ]),
+   433→          isStart: false,
+   434→        },
+   435→        {
+   436→          storyId,
+   437→          title: 'The Echo Response',
+   438→          narrative: 'Your voice cuts through the darkness and echoes back — but not your voice. The echo returns as a chorus of voices, male and female, young and old, speaking in unison: "We hear you. We have always heard. The temple is our body. The stone is our skin. The darkness is our blood. And you, traveler, are the first in centuries to speak rather than flee." The voices pause, and then one speaks alone — a young woman\'s voice, scared but determined: "Please. Help us. We are the seven, trapped between stone and silence. The one who imprisoned us is still here. It sleeps below, dreaming of freedom. If it wakes, it will consume everything — stone, air, memory, and mind. You must reach the heart of the temple before it wakes. The path is lit by those who remember." As if in response, faint lights appear along the walls — phosphorescent moss that has been dormant for centuries, now blooming at the sound of human speech.',
+   439→          imageUrl: '',
+   440→          choices: JSON.stringify([
+   441→            { text: 'Follow the glowing moss deeper', nextScene: 7 },
+   442→            { text: 'Ask the voices how to defeat the entity', nextScene: 18 },
+   443→            { text: 'Try to communicate with the seven directly', nextScene: 8 },
+   444→          ]),
+   445→          isStart: false,
+   446→        },
+   447→        {
+   448→          storyId,
+   449→          title: 'The Journal Transforms',
+   450→          narrative: 'You pick up the journal and tuck it into your pack, but as soon as it touches the fabric, you feel a shock of cold run through your body. The journal is warm — warmer than body temperature — and when you open it again, the pages are different. New writing has appeared, ink bleeding onto the pages as you watch. The handwriting is not Dr. Croft\'s. It is yours. Or rather, it will be. The entries describe what you are about to do — enter the temple, face the trials, encounter The Dreamer. But the entries end abruptly at a blank page with a single instruction: "Write what happens next. Your words become the temple\'s reality." The journal has become a magical artifact — whatever you write in it will manifest within the temple. But the warning is implicit: with the power to change reality comes the responsibility for consequences you cannot foresee.',
+   451→          imageUrl: '',
+   452→          choices: JSON.stringify([
+   453→            { text: 'Write "I find a safe path through the temple"', nextScene: 19 },
+   454→            { text: 'Write "The temple reveals its true nature"', nextScene: 14 },
+   455→            { text: 'Destroy the journal to prevent misuse', nextScene: 20 },
+   456→          ]),
+   457→          isStart: false,
+   458→        },
+   459→      ];
+   460→    }
+   461→
+   462→    // Ocean of Stars
+   463→    return [
+   464→      {
+   465→        storyId,
+   466→        title: 'The Empty Ship',
+   467→        narrative: 'You wake to the sound of waves — not the crash and hiss of ocean waves, but a soft, rhythmic shimmer, like light rippling across water. You are lying on a polished wooden deck under a sky filled with stars so close they seem to brush your fingertips. But these are not ordinary stars. They pulse with colors — gold, violet, emerald — and they form patterns that look disturbingly like circuitry. You stand up, steadying yourself against the mast. The ship is a three-masted schooner, beautifully crafted but utterly empty. No crew, no passengers, no captain. The wheel turns slowly on its own, steering a course you cannot determine. A compass at the helm points not north but upward, toward the zenith of the star-sea. On the deck beside you lies a sealed envelope with your name written in an elegant script.',
+   468→        imageUrl: '',
+   469→        choices: JSON.stringify([
+   470→          { text: 'Open the envelope', nextScene: 1 },
+   471→          { text: 'Search the ship below deck', nextScene: 2 },
+   472→          { text: 'Try to take control of the wheel', nextScene: 3 },
+   473→        ]),
+   474→        isStart: true,
+   475→      },
+   476→      {
+   477→        storyId,
+   478→        title: 'The Captain\'s Letter',
+   479→        narrative: 'Inside the envelope, you find a single page of handwritten text on thick, cream-colored paper that smells faintly of lavender and salt. The letter reads: "To whoever wakes next — I am sorry for leaving you alone. I was the last one awake, and the call became too strong to resist. The Star Ocean is not what it appears to be. It is not water but thought — the collective dreams of a billion sleeping minds. The ship sails on these dreams, and its course is determined by the strongest dreamer among the sleeping crew. They are dreaming of home, and the ship is taking them there. But the Star Ocean is dangerous for those who remain awake. The dreams are hungry. They will try to pull you under, into sleep, into the collective unconscious. Resist if you can. Find the Star Compass before dawn. It is the only way to navigate home. I have hidden it in the anchor locker. Good luck. — Captain Elara Vex."',
+   480→        imageUrl: '',
+   481→        choices: JSON.stringify([
+   482→          { text: 'Go to the anchor locker to find the Star Compass', nextScene: 4 },
+   483→          { text: 'Wake up a crew member to help', nextScene: 5 },
+   484→          { text: 'Study the stars for navigation', nextScene: 3 },
+   485→        ]),
+   486→        isStart: false,
+   487→      },
+   488→      {
+   489→        storyId,
+   490→        title: 'Below Deck',
+   491→        narrative: 'You descend the narrow staircase into the ship\'s interior. The cabin is warm and dimly lit by phosphorescent crystals embedded in the ceiling — a star map in miniature, mirroring the sky above. The ship is in remarkable condition, every surface polished, every rope coiled perfectly. But the crew\'s quarters tell a different story. In every cabin, a person lies sleeping — deeply, unnaturally still, their faces peaceful but their bodies cold to the touch. There are twelve crew members, dressed in clothes from different eras — some in sailing gear, some in modern clothes, one in what appears to be a spacesuit. A logbook on the captain\'s desk reveals that the crew has been collecting people from different time periods for decades, pulling them into the Star Ocean when their dreams are strong enough to catch the ship\'s attention. The latest entry, dated yesterday according to the ship\'s clock, reads simply: "Another one waking. The cycle continues."',
+   492→        imageUrl: '',
+   493→        choices: JSON.stringify([
+   494→          { text: 'Try to wake the crew member in the spacesuit', nextScene: 5 },
+   495→          { text: 'Read the full logbook', nextScene: 6 },
+   496→          { text: 'Return to the deck immediately', nextScene: 1 },
+   497→        ]),
+   498→        isStart: false,
+   499→      },
+   500→      {
+   501→        storyId,
+   502→        title: 'The Star Map',
+   503→        narrative: 'You grip the wheel, trying to force it in a new direction. For a moment, it resists — as if the ship itself is pushing back. Then, with a shudder that runs through the entire vessel, the wheel turns. The stars overhead shift, rearranging themselves into new constellations you have never seen before. One pattern catches your eye — a spiral, like a galaxy, that seems to pulse in sync with your heartbeat. As you stare at it, a voice emerges from the stars themselves — not a human voice, but something older, something made of light and frequency. "Navigator detected. Course adjustment acknowledged. Current destination: Origin Point. Estimated arrival: before the last star dims. Warning: the Ocean responds to intention. Navigate with purpose, or the waves will decide for you." The wheel grows warm in your hands, and you feel a connection to the ship — a sensation of becoming an extension of the vessel, feeling the currents of dream-stuff against your hull.',
+   504→        imageUrl: '',
+   505→        choices: JSON.stringify([
+   506→          { text: 'Focus on finding your way home', nextScene: 7 },
+   507→          { text: 'Ask the voice about the Origin Point', nextScene: 8 },
+   508→          { text: 'Let the ship guide itself', nextScene: 9 },
+   509→        ]),
+   510→        isStart: false,
+   511→      },
+   512→    ];
+   513→  }
+   514→
+   515→  if (language === 'ne') {
+   516→    return [
+   517→      {
+   518→        storyId,
+   519→        title: 'दरबारको ढोका',
+   520→        narrative: 'तिमी एउटा पुरानो दरबारको अगाडि उभिनुहुन्छ। दरबारको दुवै ढोका अधेरोमा लुकेका छन्, तर अन्दा बाट एउटा किरिना आउँछ। दरबार तीन सय बर्ष पुरानो छ — र त्यसको हर इंटा एउटा कथा भन्छ। तिम्रो अगाडि दुवै बाटो छन्: एउटा बायाँतिर जान्छ, जहाँ जुना तस्बिरहरू लटकेका छन्। अर्को दायाँतिर जान्छ, जहाँ अँध्यारो गहिरो छ। जमिनमा एउटा पुरानो पत्र पर्छ — त्यसमा लेखिएको छ: "जो भित्र पस्छ, फर्कने छैन।" हावा चल्छ, र दरबारको ढोका थोरै डाँड-डाँड हुन्छ।',
+   521→        imageUrl: '',
+   522→        choices: JSON.stringify([
+   523→          { text: 'बायाँ बाटो रोज्नुहोस्', nextScene: 1 },
+   524→          { text: 'दायाँ बाटो रोज्नुहोस्', nextScene: 2 },
+   525→          { text: 'पत्र पढ्न थाल्नुहोस्', nextScene: 3 },
+   526→        ]),
+   527→        isStart: true,
+   528→      },
+   529→      {
+   530→        storyId,
+   531→        title: 'तस्बिरहरूको कोठा',
+   532→        narrative: 'तिमी बायाँ बाटो बाट भित्र प्रवेश गर्नुहुन्छ। देखिन्छ — एउटा ठूलो कोठा जसको चारै दिशामा तस्बिरहरू लटकेका छन्। ती तस्बिरहरू अनौठा छन् — तस्बिरमा मानिसहरू हेर्दै छन्, र जुन दिशाबाट हेर्नुहुन्छ, तिमी लाग्छ कि उनीहरू तिमी हेरिरहेका छन्। कोठाको बीचमा एउटा अग्लो मेज छ, र त्यसमाथि एउटा मोमबत्ती बलिरहेको छ। मेजको किनारामा एउटा छाता राखिएको छ, र त्यसमा केही लेखिएको छ: "साँचो कुरा बोल, बाटो खुल्छ। झुटो कुरा बोल, अँध्यारो तिम्रो नाम थाहा पाउँछ।"',
+   533→        imageUrl: '',
+   534→        choices: JSON.stringify([
+   535→          { text: 'तस्बिरहरू करिब हेर्नुहोस्', nextScene: 4 },
+   536→          { text: 'मेजको छाता पढ्नुहोस्', nextScene: 5 },
+   537→          { text: 'अर्को कोठा खोज्नुहोस्', nextScene: 6 },
+   538→        ]),
+   539→        isStart: false,
+   540→      },
+   541→      {
+   542→        storyId,
+   543→        title: 'अँध्यारो गल्ली',
+   544→        narrative: 'तिमी दायाँ बाटो बाट अँध्यारोमा हिंड्नुहुन्छ। अँध्यारो यति गहिरो छ कि आफ्नो हात पनि देख्न सक्दैनौ। तर एउटा कुरा अनौठो छ — तिमी चिसो महसूस गर्दैनौ। बरु, तिमी एउटा गर्मी महसूस गर्छौ — जस्तै कुनै जीवित चीजको छुट्टै शरीर हो। अँध्यारोमा तिमीले कुनै आवाज सुन्नुहुन्छ — एउटा सानो आवाज, जस्तै कसैले आफ्नो नाम बोलेको छ। तिमी रोकिनुहुन्छ र सुन्नुहुन्छ। आवाज फेरि आउँछ — यो पक्का तिम्रो नाम हो। तर को भनिरहेको छ?',
+   545→        imageUrl: '',
+   546→        choices: JSON.stringify([
+   547→          { text: 'आवाजको पछ्याउँ गर्नुहोस्', nextScene: 7 },
+   548→          { text: 'बायाँ बाटो फर्कनुहोस्', nextScene: 1 },
+   549→          { text: 'त्यहीँ उभिएर आवाज सुन्नुहोस्', nextScene: 8 },
+   550→        ]),
+   551→        isStart: false,
+   552→      },
+   553→      {
+   554→        storyId,
+   555→        title: 'पत्रको रहस्य',
+   556→        narrative: 'तिमी जमिनबाट पत्र उठाउनुहुन्छ र बत्तीको किरणमा पढ्नुहुन्छ। पत्र धेरै पुरानो छ — कागज पहेँलो भइसकेको छ, र शब्दहरू अस्पष्ट छन्। तर तिमी पढ्न सक्छौ: "यो दरबार एउटा राजाले बनाएका थिए जसले आफ्नो छोरोलाई यहाँ बन्दी बनाए। छोरोले दरबारमा एउटा रहस्य लुकाए — एउटा खजाना जुन राजाले कहिल्यै नभेटेका। खजाना भित्र छ, तर भित्र जाने बाटो अँध्यारोमा छ। र अँध्यारोमा जुन बसेको छ, त्यो मानिस होइन। त्यो केही अर्को हो।" पत्रको अन्त्यमा एउटा चिन्ह छ — एउटा अनौठो चिन्ह जुन तिमीले कहिल्यै नदेखेको।',
+   557→        imageUrl: '',
+   558→        choices: JSON.stringify([
+   559→          { text: 'चिन्हको अर्थ खोज्नुहोस्', nextScene: 9 },
+   560→          { text: 'पत्र साथ लिएर बायाँ बाटो जानुहोस्', nextScene: 1 },
+   561→          { text: 'दायाँ बाटो जानुहोस्, अँध्यारोमा', nextScene: 2 },
+   562→        ]),
+   563→        isStart: false,
+   564→      },
+   565→      {
+   566→        storyId,
+   567→        title: 'खजाना',
+   568→        narrative: 'तिमी दरबारको सबैभन्दा गहिरो भागमा पुग्नुहुन्छ। त्यहाँ एउटा ठूलो ढोका छ, र त्यसमाथि पुरानो नेपालीमा लेखिएको छ: "सत्यले खुल्छ, झुटोले बन्द गर्छ।" तिमी ढोका धकेल्नुहुन्छ, र त्यो खुल्छ। भित्र, एउटा ठूलो कोठा छ जसको छतबाट तारा जस्तो प्रकाश आउँछ। कोठाको बीचमा एउटा डब्बा छ — र त्यसमा तिमीले एउटा अनौठो वस्तु भेट्टाउनुहुन्छ। त्यो वस्तु तिम्रो जीवन परिवर्तन गर्नेछ। तर पहिले, तिमीले एउटा निर्णय गर्नुपर्छ — त्यो वस्तु राख्ने कि फर्काउने?',
+   569→        imageUrl: '',
+   570→        choices: JSON.stringify([
+   571→          { text: 'वस्तु राख्नुहोस् — यो तिम्रो हो', nextScene: 10 },
+   572→          { text: 'वस्तु फर्काउनुहोस् — यो यहाँको हो', nextScene: 11 },
+   573→          { text: 'वस्तुको बारेमा थप जानकारी खोज्नुहोस्', nextScene: 12 },
+   574→        ]),
+   575→        isStart: false,
+   576→      },
+   577→    ];
+   578→  }
+   579→
+   580→  // Hindi
+   581→  return [
+   582→    {
+   583→      storyId,
+   584→      title: 'बंगले का दरवाजा',
+   585→      narrative: 'तुम एक पुराने बंगले के सामने खड़े हो। बंगला सौ साल से ज़्यादा पुराना है, और उसकी दीवारों पर ज़माने के दाग लगे हैं। दरवाज़ा खुला है, लेकिन अंदर अंधेरा है। ज़मीन पर एक पुराना खत गिरा हुआ है, जिस पर लिखा है: "जो अंदर जाएगा, वापस नहीं आएगा।" हवा चलती है, और बंगले का दरवाज़ा थोड़ा चरमराता है। तुम्हारे सामने दो रास्ते हैं — एक बाईं तरफ़ जाता है, जहाँ एक हल्की रोशनी दिखती है। दूसरा दाईं तरफ़, जहाँ पूरा अंधेरा है।',
+   586→      imageUrl: '',
+   587→      choices: JSON.stringify([
+   588→        { text: 'बाईं तरफ़ जाओ (रोशनी वाला रास्ता)', nextScene: 1 },
+   589→        { text: 'दाईं तरफ़ जाओ (अंधेरा रास्ता)', nextScene: 2 },
+   590→        { text: 'खत उठाओ और पढ़ो', nextScene: 3 },
+   591→      ]),
+   592→      isStart: true,
+   593→    },
+   594→    {
+   595→      storyId,
+   596→      title: 'भूतिया कमरा',
+   597→      narrative: 'तुम बाईं तरफ़ जाते हो और एक बड़े कमरे में पहुँचते हो। कमरे की दीवारों पर पुरानी तस्वीरें लटकी हैं। तस्वीरों में लोग हैं — लेकिन जब तुम उन्हें देखते हो, तो लगता है कि वो तुम्हें देख रहे हैं। कमरे के बीच में एक मेज़ है, और उस पर एक मोमबत्ती जल रही है। मेज़ पर एक कागज़ रखा है, जिस पर लिखा है: "सच बोलो, तो रास्ता खुलेगा। झूठ बोलो, तो अंधेरा तुम्हारा नाम जान लेगा।"',
+   598→      imageUrl: '',
+   599→      choices: JSON.stringify([
+   600→        { text: 'तस्वीरों को करीब से देखो', nextScene: 4 },
+   601→        { text: 'कागज़ पर लिखी बात पढ़ो', nextScene: 5 },
+   602→        { text: 'दूसरा कमरा ढूँढो', nextScene: 6 },
+   603→      ]),
+   604→      isStart: false,
+   605→    },
+   606→    {
+   607→      storyId,
+   608→      title: 'अंधेरा गलियारा',
+   609→      narrative: 'तुम अंधेरे रास्ते पर चलते हो। अंधेरा इतना गहरा है कि अपना हाथ भी नहीं देख सकते। लेकिन एक अजीब बात है — तुम्हें ठंड नहीं लग रही। बल्कि, एक गर्माहट महसूस हो रही है — जैसे कोई जीवित चीज़ पास हो। अंधेरे में तुम्हें एक आवाज़ सुनाई देती है — एक छोटी सी आवाज़, जैसे किसी ने तुम्हारा नाम लिया हो। तुम रुक जाते हो और सुनते हो। आवाज़ फिर आती है — यह तुम्हारा नाम है, पक्का।',
+   610→      imageUrl: '',
+   611→      choices: JSON.stringify([
+   612→        { text: 'आवाज़ का पीछा करो', nextScene: 7 },
+   613→        { text: 'वापस बाईं रास्ते पर जाओ', nextScene: 1 },
+   614→        { text: 'वहीं खड़े रहकर आवाज़ सुनो', nextScene: 8 },
+   615→      ]),
+   616→      isStart: false,
+   617→    },
+   618→    {
+   619→      storyId,
+   620→      title: 'खजाने का कमरा',
+   621→      narrative: 'तुम बंगले के सबसे गहरे हिस्से में पहुँचते हो। वहाँ एक बड़ा दरवाज़ा है, और उस पर पुरानी भाषा में कुछ लिखा है। तुम दरवाज़ा धकेलते हो, और वह खुल जाता है। अंदर, एक बड़ा कमरा है जिसकी छत से तारे जैसी रोशनी आ रही है। कमरे के बीच में एक संदूक है — और उसमें तुम्हें एक अजीब चीज़ मिलती है। वो चीज़ तुम्हारी ज़िंदगी बदल देगी। लेकिन पहले, तुम्हें एक फैसला करना होगा — वो चीज़ रखनी है या वापस भेजनी है?',
+   622→      imageUrl: '',
+   623→      choices: JSON.stringify([
+   624→        { text: 'चीज़ रखो — ये तुम्हारी है', nextScene: 10 },
+   625→        { text: 'चीज़ वापस भेजो — ये यहाँ की है', nextScene: 11 },
+   626→        { text: 'पहले और जानकारी ढूँढो', nextScene: 12 },
+   627→      ]),
+   628→      isStart: false,
+   629→    },
+   630→  ];
+   631→}
+   632→
+   633→seed()
+   634→  .catch(console.error)
+   635→  .finally(() => process.exit(0));
+   636→

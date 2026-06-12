@@ -244,11 +244,19 @@ async function seed() {
       language: 'en',
       genre: 'scifi',
     },
+    {
+      title: 'AUQAAT: Too Late for Mercy',
+      description: 'You are Zara Khalid, a successful journalist who destroyed an innocent woman\'s life with a fabricated story five years ago. Tonight, a mysterious pocket watch arrives at your door with a note: "Turn back the hands. You have twelve hours to undo the worst mistake of your life." Every time you rewind, the present shifts in unexpected ways. Navigate guilt, redemption, and the terrifying question — can you truly fix the past, or will you only make it worse?',
+      coverUrl: '',
+      language: 'en',
+      genre: 'drama',
+    },
   ];
 
-  for (const story of roleplayStories) {
+  for (let i = 0; i < roleplayStories.length; i++) {
+    const story = roleplayStories[i];
     const createdStory = await db.roleplayStory.create({ data: story });
-    const scenes = generateRoleplayScenes(createdStory.id, story.language);
+    const scenes = generateRoleplayScenes(createdStory.id, story.language, story.title, i);
     for (const scene of scenes) {
       await db.roleplayScene.create({ data: scene });
     }
@@ -324,7 +332,263 @@ function generateChapterContent(novel: { title: string; language: string; author
   return `Chapter ${chapterNum} of "${novel.title}" by ${novel.author}. Content continues...`;
 }
 
-function generateRoleplayScenes(storyId: string, language: string): Array<{
+function generateAuqaatScenes(storyId: string): Array<{
+  storyId: string;
+  title: string;
+  narrative: string;
+  imageUrl: string;
+  choices: string;
+  isStart: boolean;
+}> {
+  return [
+    {
+      storyId,
+      title: 'The Anonymous Package',
+      narrative: 'The courier arrives at 11:47 PM, knocking three times — sharp, deliberate, as if each knock costs something. You open the door of your Mumbai apartment to find a small leather box on the mat. No return address. No name. Just your address, written in handwriting you almost recognize — elegant, slanted, like someone who learned penmanship in another era. Inside the box, cushioned in faded velvet, lies a pocket watch. It is old, heavier than it looks, and the face has no numbers — only twelve marks etched like wounds into the silver. A folded note lies beneath it: "Turn back the hands. You have twelve hours to undo the worst mistake of your life. — M." You turn the watch over. On the back, engraved in tiny letters, are the words: "Some debts cannot be paid. Only carried." Your hands are trembling. You know what mistake this refers to. You have carried it for five years. The name Meera Sharma has lived in the back of your mind like a splinter you could not remove.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Turn the watch hands back immediately', nextScene: 1 },
+        { text: 'Investigate who sent this — find the sender first', nextScene: 2 },
+        { text: 'Throw the watch away — the past should stay buried', nextScene: 3 },
+      ]),
+      isStart: true,
+    },
+    {
+      storyId,
+      title: 'Five Years Ago — The Newsroom',
+      narrative: 'The world lurches. You are standing in the newsroom of The Mumbai Chronicle, and the air smells of ink and stale coffee. The date on the wall calendar reads March 15 — five years ago. Your younger self sits at your desk, staring at a photograph of a woman named Meera Sharma. She is a schoolteacher accused of embezzling funds from the orphanage where she worked. Your editor, Vikram Desai, stands behind you, his hand on your shoulder. "The source is solid, Zara. Run it." You remember this moment with nauseating clarity. You ran the story. It was front page. Meera lost her job, her reputation, her family\'s trust. And later — much later — you discovered the source had lied. The embezzlement was committed by someone else, and Meera had been framed to protect them. You never printed a retraction. Your younger self reaches for the keyboard, ready to publish.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Stop your younger self — refuse to publish the story', nextScene: 4 },
+        { text: 'Let it publish but rewrite it with doubt and caveats', nextScene: 5 },
+        { text: 'Confront Vikram about the source instead', nextScene: 6 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The Return Address',
+      narrative: 'You set the watch down carefully and examine the box for any clue. The leather is high quality — handmade, you think, by someone who knows their craft. Inside the lid, pressed into the velvet lining, you find a business card so old the ink has faded to brown. It reads: "Professor Ayesha Malik, Department of History, University of Mumbai." You remember Professor Malik. She taught your journalism ethics class fifteen years ago. She was the one who told you that "the truth is not a weapon, but a responsibility." You haven\'t spoken to her since graduation. The card has a phone number circled in red ink, and beneath it, in the same handwriting as the note, three words: "She knows why." The clock on your wall reads 11:52 PM. Eleven hours and eight minutes remaining. Your phone buzzes — an unknown number. You hesitate, then answer. A woman\'s voice, familiar but aged: "Zara. I have been waiting for this call for a very long time."',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Go to Professor Malik\'s office tonight', nextScene: 7 },
+        { text: 'Ask how she got the watch and who "M" is', nextScene: 8 },
+        { text: 'Hang up and use the watch first — time is running out', nextScene: 1 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The Watch Refuses to Leave',
+      narrative: 'You throw the box into the hallway trash. You close the door, pour yourself a glass of water, and sit on the couch. Your reflection in the dark window looks exhausted — the kind of exhaustion that sleep cannot fix. Three minutes pass. Then you hear it: a soft ticking from somewhere inside the apartment. You check every drawer, every shelf. Nothing. But the ticking persists, growing louder, as if the watch is getting closer. You look at the hallway through the peephole. The trash bag is still there, undisturbed. But when you open the door, the leather box is sitting on your doormat again, exactly where the courier left it. The note inside now has an additional line, written in fresh ink: "The past does not forget, Zara. Neither should you." Your phone rings. It is Ravi, your oldest friend and the one person who knows what you did to Meera Sharma. "Zara, are you okay? I had a dream about her tonight. About Meera. I think someone is trying to tell us something."',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Tell Ravi everything — the watch, the note, all of it', nextScene: 9 },
+        { text: 'Pick up the watch and turn it back — you have no choice now', nextScene: 1 },
+        { text: 'Ignore Ravi and try to destroy the watch', nextScene: 14 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The Unpublished Truth',
+      narrative: 'You grab your younger self\'s wrist before her fingers reach the keyboard. She — you — looks up, startled and angry. "What are you doing? Vikram wants this story." You lean close and whisper everything: the false source, the frame job, the destruction of Meera\'s life, the five years of guilt that follow. Your younger self listens with widening eyes. For a long moment, she is silent. Then she stands and walks to Vikram\'s office. You follow. Vikram looks up from his desk, irritation flickering across his face. "Zara, the deadline is in twenty minutes. Where is the copy?" Your younger self takes a breath. "I am not running it. The source is compromised. I believe Meera Sharma is innocent, and I will not be part of destroying her." Vikram\'s face goes through several emotions — surprise, anger, calculation. "If you don\'t run it," he says quietly, "I will find someone who will. And it will be worse, because they will not care about getting it right."',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Go to Meera directly and warn her before the story breaks', nextScene: 10 },
+        { text: 'Stay and fight Vikram — take the story to the publisher', nextScene: 11 },
+        { text: 'Steal the source file and destroy the evidence', nextScene: 12 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The Compromise',
+      narrative: 'You cannot stop your younger self entirely — she is you, after all, driven by the same ambition that has always been your greatest flaw and most powerful engine. But you manage to plant a seed of doubt. She rewrites the story, adding caveats: "Allegations remain unverified," "The source declined to provide documentary evidence," "Ms. Sharma denies all charges." It is not enough. The story still runs, still damages Meera\'s reputation, still ruins her career. But it is less absolute. It leaves a door open — a crack of ambiguity that a careful reader might notice. When you snap back to the present, the watch feels warm in your hand. The face shows a different time now: not the present, but an alternate present. Your apartment is smaller. Your bookshelf holds no awards. You check your phone — no messages from colleagues at the Chronicle. You were fired six months after the compromised story ran. Vikram called it "a failure of editorial conviction." The irony is so sharp it cuts.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Find Meera in this timeline and apologize', nextScene: 13 },
+        { text: 'Turn the watch again — try a different approach', nextScene: 6 },
+        { text: 'Accept this new reality — you lost your career but kept your soul', nextScene: 11 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: "The Editor's Secret",
+      narrative: 'You follow your younger self into Vikram\'s office and watch as she demands to know more about the source. Vikram\'s composure cracks, just slightly. He closes the door and lowers his voice. "The source is connected to people you do not want to cross, Zara. People who fund this newspaper. People who have the power to make stories — and people — disappear." Your younger self pales but does not back down. "Who?" Vikram slides a file across his desk. Inside, you see photographs, bank statements, a web of connections linking a powerful real estate developer to the orphanage\'s board of directors. The developer wanted the orphanage\'s land. Meera was the only teacher who refused to sign off on the sale. So they framed her. And your newspaper — your editor — helped them do it. "I was told to run this story," Vikram says, and for the first time, you see genuine fear in his eyes. "Not asked. Told. By people who do not use the word \'please.\'"',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Take the file and expose everyone — the developer, the board, Vikram', nextScene: 10 },
+        { text: 'Make a deal with Vikram to protect yourself while quietly helping Meera', nextScene: 14 },
+        { text: 'Go directly to Meera with the evidence and help her fight back', nextScene: 13 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: "The Professor's Confession",
+      narrative: 'Professor Malik\'s office is on the fourth floor of the history building, a cluttered sanctuary of books, maps, and artifacts from a dozen cultures. She is older than you remember — her hair fully silver now, her movements slower. But her eyes are sharp, watching you as you enter. The watch sits on her desk between you like a chess piece. "I was twenty-three when I found it," she says, not waiting for your questions. "In a market in Istanbul, buried in a box of broken clocks. I was a different person then — reckless, certain, convinced I knew what was right." She pauses, and for a moment, you see the weight of decades in her expression. "I used it three times. The first time, I saved someone\'s life. The second time, I tried to save a relationship. The third time..." She stops. "The third time, I learned the rule. You can change events, Zara. But you cannot change people. They will make the same choices, find the same ruins, build the same walls. The watch changes the weather, not the climate." She pushes the watch back toward you. "The question is not whether you can fix the past. It is whether you can live with what fixing it costs."',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Ask what happened on her third use of the watch', nextScene: 15 },
+        { text: 'Take the watch and try anyway — Meera deserves that much', nextScene: 1 },
+        { text: 'Ask if there is another way to help Meera without the watch', nextScene: 9 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'Digital Footprints',
+      narrative: 'The phone call ends, and you sit in the blue glow of your laptop screen, researching everything you can find about Professor Malik. She retired two years ago, but her online footprint is extensive — academic papers, a blog about journalistic ethics (with several posts that seem aimed directly at you, though they never name you), and a trail of connections to Meera Sharma. They know each other. A photograph on Malik\'s blog shows her standing beside a younger Meera at what appears to be a teaching conference. The caption reads: "My most promising student." Your stomach drops. Meera was a student of Malik\'s before she became a teacher. Malik has been following your career — and Meera\'s downfall — with the intimate knowledge of someone connected to both of you. She did not send the watch by accident. She sent it as a verdict. You find another blog post, dated one year ago, titled simply: "The Unretracted." It is about the ethics of journalists who destroy lives and never apologize. It has been shared forty thousand times.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Go to Professor Malik and confront her about the blog posts', nextScene: 7 },
+        { text: 'Use the watch now — the research can wait, Meera cannot', nextScene: 1 },
+        { text: 'Search for Meera\'s current whereabouts first', nextScene: 13 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: "Ravi's Warning",
+      narrative: 'You tell Ravi everything. The watch, the note, the return address, the terror of holding your own worst mistake in your hands. He is quiet for a long time. Ravi has always been the measured one — the friend who thinks before speaking, who calculates angles while you charge ahead. When he finally speaks, his voice is careful. "Zara, I have been carrying this too. I was there that night at the press club when you celebrated the story going viral. I saw the headline and I knew — I knew something was wrong. The numbers did not add up, and I said nothing." He pauses. "If you change the past, you change both of us. My silence becomes something different. My guilt becomes something different. Are you sure you have the right to make that choice for me?" It is a fair question, and it lands like a stone in water, sending ripples through every assumption you have made tonight.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Tell Ravi he is right — you will find another way', nextScene: 8 },
+        { text: 'Argue that Meera\'s suffering outweighs both your guilts', nextScene: 1 },
+        { text: 'Ask Ravi to come with you to find Meera tonight', nextScene: 13 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The Public Confession',
+      narrative: 'You go to Meera before the story breaks. She lives in a small apartment near the school, and when you knock on her door, she opens it with the cautious smile of someone who trusts the world just enough. You tell her everything — the story, the source, the frame job, the people who want her land. She listens without interrupting, her expression shifting from confusion to understanding to something harder, something made of steel. "I knew they were after the land," she says quietly. "I did not think they would use someone like you to do it." The words land like a verdict. Together, you go to the publisher of the Chronicle with the evidence Vikram gave you. You publish the real story — the frame job, the developer, the corruption — with your name on the byline. The fallout is immediate and brutal. The developer sues. Vikram is fired. You receive death threats. But Meera\'s name is cleared, and the orphanage keeps its land. When you return to the present, the watch is cold and still in your hand. The face shows no time at all. It is over.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Look at your life in this new present', nextScene: 16 },
+        { text: 'Try to turn the watch one last time', nextScene: 17 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'A Different Path',
+      narrative: 'You take the story to the publisher yourself, bypassing Vikram entirely. The publisher — an elderly man named Mr. Khanna who has been running the Chronicle for forty years — listens to your evidence with the patience of a judge. When you finish, he removes his glasses and rubs his eyes. "I have made many mistakes in this business," he says. "Publishing too quickly is one. Publishing too slowly is another. But the worst mistake is knowing the truth and choosing silence." He does not fire Vikram. He does not confront the developer. Instead, he assigns you to a new beat: investigating the developer\'s other properties, his political connections, his network of influence. It is slow, painstaking work — months of following paper trails and coaxing terrified witnesses to speak. But it builds a case that eventually brings the developer down. Meera\'s name is cleared in a footnote on page seven of a routine legal report. It is not dramatic. It is not satisfying. But it is justice, and justice is rarely either of those things.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Find Meera and tell her what you did', nextScene: 13 },
+        { text: 'Return to the present and see what changed', nextScene: 16 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The Stolen Evidence',
+      narrative: 'You wait until the newsroom empties, then slip back inside using your old access code. Vikram\'s office is locked, but you know where he keeps the spare key — taped behind the water cooler, a detail that would be comical if the stakes were not so high. The source file is in his desk, inside a red folder marked "CONFIDENTIAL — NOT FOR PUBLICATION." You take it. The evidence is damning: emails between the developer\'s lawyer and your newspaper\'s management, instructing them to run the Meera story on a specific date to coincide with the land acquisition hearing. You photograph every page with your phone, then burn the originals in the office sink. When Vikram arrives the next morning and finds the empty folder, his face goes white. He calls you, screaming. You do not answer. Instead, you send the photographs to Meera anonymously, with a note: "Use these. They will try to stop you. Do not let them." You have become the source now — anonymous, untraceable, and carrying the same weight of truth and consequences that your own source carried five years ago.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Stay in the past and watch what Meera does with the evidence', nextScene: 10 },
+        { text: 'Return to the present immediately', nextScene: 16 },
+        { text: 'Destroy the watch — you have done what you can', nextScene: 18 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'Finding Meera',
+      narrative: 'It takes you six hours to find her. Meera Sharma no longer lives in Mumbai. She moved to a small town in Kerala, three hours from the nearest city, where she runs a tutoring center for children who cannot afford school fees. You find her through a mutual acquaintance who warns you that Meera has built a new life and may not want to revisit the old one. You drive through the night, the watch sitting in your pocket like a second heartbeat. When you arrive at the tutoring center — a bright, clean building with hand-painted murals on the walls — Meera is sweeping the front step. She is thinner than you remember, her hair shorter, her eyes carrying a quietness that was not there before. She looks up and sees you, and for a moment, time stops. She knows who you are. Of course she does. "Zara Khalid," she says, not with anger, but with the tired recognition of someone meeting an old wound. "I wondered when you would come."',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Apologize sincerely — no excuses, no explanations', nextScene: 17 },
+        { text: 'Offer to help her rebuild what was lost — fund the center, use your connections', nextScene: 18 },
+        { text: 'Show her the watch and explain everything', nextScene: 15 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: "The Deal with Darkness",
+      narrative: 'You sit across from Vikram in a coffee shop near the office, and you make the kind of deal that would have horrified your younger self. You will not expose the developer. You will not confront the newspaper\'s management. In exchange, Vikram will use his connections to quietly settle Meera\'s case, restore her teaching license, and ensure she finds work at a school far from Mumbai. It is a compromise built on silence — the very silence that destroyed Meera in the first place. But it is practical, and right now, practicality feels like the only rope in a storm. Vikram shakes your hand. "You are learning," he says, and it sounds like both a compliment and a threat. You return to the present holding the watch, and for a moment, everything seems the same. Your apartment is unchanged. Your career is intact. But on your desk, you find a letter — from a law firm in Kochi, informing you that Meera Sharma has declined your anonymous settlement offer and is filing a defamation case against The Mumbai Chronicle. She has found a lawyer. She is fighting back on her own terms.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Break the deal and testify on Meera\'s behalf', nextScene: 10 },
+        { text: 'Contact Meera directly and ask what she actually needs', nextScene: 13 },
+        { text: 'Use the watch to try again — this time, do it right', nextScene: 1 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: "The Professor's Third Wish",
+      narrative: 'Professor Malik pours two cups of chai and sits across from you. The clock on her wall ticks steadily — an ordinary clock, with numbers, with no power over time. "The third time I used the watch," she begins, "I tried to save my daughter\'s marriage. She was married to a man who was slowly breaking her — not with violence, but with control, with isolation, with the careful demolition of her confidence. I turned the watch back to the day she accepted his proposal and told her everything I had seen." She sips her chai. "She married him anyway. Because she loved him. Because people make choices based on who they are, not based on what they know. I could change the weather, Zara, but I could not change the climate of her heart." She sets down the cup. "Meera Sharma may forgive you. She may not. That is her choice. But if you use the watch to erase the harm without her knowledge, you are making the same arrogant choice you made five years ago — deciding what happens to Meera without asking Meera." The room is very quiet. "The watch is not mercy, Zara. It is vanity dressed as redemption."',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'She is right — find Meera and face her without the watch', nextScene: 13 },
+        { text: 'Use the watch anyway — at least you can try', nextScene: 1 },
+        { text: 'Ask Malik to help you find a middle path', nextScene: 9 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The New Present',
+      narrative: 'The watch ticks one final time and stops. You are back in your apartment, and the first thing you notice is the silence — a different quality of silence, as if the walls have been listening for years and have finally stopped. The clock reads 6:00 AM. Through your window, Mumbai is waking up — the sound of traffic, a distant train, a vendor calling out prices for chai. Everything looks the same. But everything is different. On your desk, next to the dead watch, is a newspaper — today\'s edition. Your eyes scan the front page. Your name is not in it. Instead, there is a story about a schoolteacher in Kerala who won a national award for her work with underprivileged children. Her name is Meera Sharma. The photograph shows a woman with short hair and quiet eyes, standing in front of a bright building with hand-painted murals. She is smiling — not broadly, but genuinely, the way people smile when they have built something that matters. Below the photograph, in smaller text: "Ms. Sharma credits her success to \'the people who had the courage to stand up when it mattered.\'" You do not know if she means you. You may never know. But the watch is still, and the morning is new, and for the first time in five years, the weight on your chest has lifted — not entirely, but enough.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Write Meera a letter — no watch, no tricks, just words', nextScene: 19 },
+        { text: 'Destroy the watch and begin your own redemption', nextScene: 18 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The Last Turn',
+      narrative: 'You hold the watch one final time. The hands are warm, almost alive, pulsing with the accumulated weight of every moment you have revisited. You know what Professor Malik said — that the watch changes weather, not climate. But she also said something else: "The question is whether you can live with what fixing it costs." You turn the hands back one last time, not to a specific moment, but to the feeling you had when you were twenty-two and just starting in journalism — the belief that words could change the world, that truth was sacred, that telling the right story at the right time could save a life. You find yourself standing outside Meera\'s tutoring center in Kerala. It is early morning. She has not arrived yet. You sit on the steps and wait. When she comes, carrying a bag of books and a thermos of chai, she stops. She recognizes you. "You came," she says. "Yes," you reply. "I came." You do not have the watch anymore. You left it on the steps of your apartment, ticking toward nothing. All you have is your voice, your guilt, and the stubborn, terrifying hope that the truth — spoken honestly, without agenda — might still matter.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Say everything you have carried for five years', nextScene: 17 },
+        { text: 'Ask her how you can help — and mean it', nextScene: 18 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The Apology',
+      narrative: 'You stand in front of Meera Sharma and say the words you have rehearsed a thousand times in the mirror and never once out loud. "I am sorry. I am sorry for the story. I am sorry I did not verify the source. I am sorry I chose my career over your life. I am sorry I did not print a retraction. I am sorry for every sleepless night you spent because of something I wrote. I am sorry for the years you lost. I cannot undo what I did. I have tried — there was a watch, a ridiculous, impossible watch that let me go back — and I learned that I cannot fix the past by rewriting it. The only thing I can do is stand here, in front of you, and tell you the truth." Meera listens. She does not cry. She does not shout. She looks at you with those quiet eyes and says: "I know." A long pause. "I have known for two years. A friend at the newspaper told me the source was unreliable. I could have sued. I could have fought. But I was tired, Zara. I was so tired of fighting." She looks at her tutoring center, at the murals, at the children\'s drawings in the window. "I built this instead. I built something instead of tearing something down. That was my choice. Now you have to make yours."',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Ask what she needs — and commit to it for as long as it takes', nextScene: 18 },
+        { text: 'Accept that forgiveness may not come — and keep going anyway', nextScene: 19 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'Rebuilding',
+      narrative: 'You do not use the watch again. You do not need to. Over the following months, you do something quietly radical: you show up. You help Meera expand her tutoring center. You use your journalism connections to get her story told — not the scandal, but the rebuild. You write about educational inequality in rural India, and the piece wins an award you do not feel you deserve. You donate the prize money to Meera\'s center. You teach a weekly journalism workshop at the center, and one of your students — a fifteen-year-old girl named Priya — writes an essay about her mother that makes you weep at your desk. You and Meera never become friends. That word is too small for what you share. But you become something else — two people connected by harm and repair, by the long, unglamorous work of making things right. One evening, sitting on the steps of the tutoring center as the sun sets over the Kerala backwaters, Meera says: "You know, the word \'auqaat\' means \'times\' — but it also means \'the right moment.\'" She pauses. "Maybe this is yours." You do not answer. You just watch the sun go down, and for the first time in five years, the silence between you is not heavy. It is enough.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'Accept that some things, once broken, can be made into something new', nextScene: 20 },
+        { text: 'Look at the watch one last time — it is still in your pocket', nextScene: 19 },
+      ]),
+      isStart: false,
+    },
+    {
+      storyId,
+      title: 'The Letter',
+      narrative: 'You write the letter on plain paper, with a simple pen, in your own handwriting. No journalism tricks, no carefully constructed narrative, no editor\'s red pen. Just words: "Dear Meera, I do not know if you will ever read this. I do not know if forgiveness is something you owe me, or something I have to earn, or something that simply does not exist between us. What I know is this: I was wrong. Not just wrong about the story, but wrong about what matters. I thought getting the scoop mattered. I thought my career mattered. I thought being first mattered. What matters is what I took from you — your name, your work, your peace of mind. I cannot return those things. But I can tell the truth now, and I can keep telling it, and I can make sure that no one else pays the price you paid for my ambition. That is not redemption. That is just the minimum of what a decent human being should do. I am sorry. I will keep being sorry. And I will keep trying to be better. — Zara." You put the letter in an envelope and address it to the tutoring center in Kerala. You do not send it. Not yet. You carry it with you, in your pocket, next to the watch. And one day, when you are ready — truly ready — you will.',
+      imageUrl: '',
+      choices: JSON.stringify([
+        { text: 'The journey continues — the adventure does not end here', nextScene: 21 },
+      ]),
+      isStart: false,
+    },
+  ];
+}
+
+function generateRoleplayScenes(storyId: string, language: string, title: string, storyIndex: number): Array<{
   storyId: string;
   title: string;
   narrative: string;
@@ -333,7 +597,13 @@ function generateRoleplayScenes(storyId: string, language: string): Array<{
   isStart: boolean;
 }> {
   if (language === 'en') {
-    if (storyId.endsWith('0') || storyId.endsWith('1') || storyId.endsWith('2') || storyId.endsWith('3') || storyId.endsWith('4') || storyId.endsWith('5') || storyId.endsWith('6') || storyId.endsWith('7') || storyId.endsWith('8') || storyId.endsWith('9') || storyId.endsWith('a') || storyId.endsWith('b') || storyId.endsWith('c') || storyId.endsWith('d') || storyId.endsWith('e') || storyId.endsWith('f')) {
+    // AUQAAT: Too Late for Mercy
+    if (title === 'AUQAAT: Too Late for Mercy') {
+      return generateAuqaatScenes(storyId);
+    }
+
+    // The Cursed Temple (first English story)
+    if (storyIndex === 0) {
       // The Cursed Temple
       return [
         {
